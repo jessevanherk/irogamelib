@@ -12,7 +12,10 @@ Depends on a Graph class, providing the following methods:
 
 local PathFinder = {}
 
-local PriorityQueue = require( 'lib.priorityqueue' )
+-- get the folder that we're in.
+local IRO_PATH = (...):match("(.+)%.[^%.]+$") or (...)
+
+local PriorityQueue = require( IRO_PATH .. '.priorityqueue' )
 
 function PathFinder:new( ... )
     local instance = {}
