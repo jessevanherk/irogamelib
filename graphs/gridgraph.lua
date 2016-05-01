@@ -21,6 +21,7 @@ function GridGraph:_init( width, height, values )
             if values and values[ j ] and values[ j ][ i ] then
                 self.values[ j ][ i ] = values[ j ][ i ]
             end
+            -- else leave it as nil, so we can have a sparse array.
         end
     end
 end
