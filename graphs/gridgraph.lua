@@ -15,7 +15,6 @@ function GridGraph:_init( width, height, values )
     self.height = height
     self.values = {}
 
-    print( width, height )
     for j = 1, height do
         self.values[ j ] = {}
         for i = 1, width do
@@ -23,6 +22,27 @@ function GridGraph:_init( width, height, values )
                 self.values[ j ][ i ] = values[ j ][ i ]
             end
         end
+    end
+end
+
+function GridGraph:get( point )
+    local value = nil
+    local x, y = point[ 1 ], point[ 2 ]
+    if x >= 1 and x <= self.width and y >= 1 and y <= self.height then
+        if self.values[ y ] then
+            value = self.values[ y ][ x ]
+        end
+    end
+    return value
+end
+
+function GridGraph:set( point, value )
+    local x, y = point[ 1 ], point[ 2 ]
+    if x >= 1 and x <= self.width and y >= 1 and y <= self.height then
+        if not self.values[ y ] then
+            self.values[ y ] = {}
+        end
+        self.values[ y ][ x ] = value
     end
 end
 
