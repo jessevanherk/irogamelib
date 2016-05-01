@@ -18,7 +18,7 @@ function GridGraph:_init( width, height, values )
     for j = 1, height do
         self.values[ j ] = {}
         for i = 1, width do
-            if values[ j ][ i ] then
+            if values and values[ j ] and values[ j ][ i ] then
                 self.values[ j ][ i ] = values[ j ][ i ]
             end
         end
