@@ -7,6 +7,7 @@
 
 local EntityManager = {}
 
+-- magic constructor for the system. real init code goes in init().
 function EntityManager:new( ... )
     local instance = {}
     setmetatable( instance, self )
@@ -17,7 +18,7 @@ end
 
 -- entity_templates are named tables so we can quickly create new entities then override as needed.
 -- component_templates are named tables, basically the default values for each component.
-function EntityManager:_init( entity_templates, component_templates )
+function EntityManager:_init( entity_templates, component_templates, create_cb )
     -- store entity and component templates for later use. avoids globals.
     self.entity_templates = entity_templates
     self.component_templates = component_templates
@@ -29,6 +30,18 @@ function EntityManager:_init( entity_templates, component_templates )
 
     -- additional lists for managing entities
     self.deleted_entities = {}  -- store deleted entities so they can be reaped together
+
+    -- set callback
+    if create_cb then
+        assert( type( create_cb ) == 'function', "create callback must be a function" )
+        self.on_create = create_cb
+    end
+end
+
+-- should be called once in the update callback.
+function EntityManager:update( dt )
+    -- reap old entities
+    self:reapEntities()
 end
 
 -----------------
@@ -72,6 +85,11 @@ function EntityManager:createEntity( template_name, component_overrides, tags )
     -- add entity to all of the relevant tag lists/indexes
     if ( tags and #tags > 0 ) then
         self:addTagsToEntity( entity, tags )
+    end
+
+    -- invoke the creation callback
+    if self.on_create then
+        self.on_create( entity )
     end
 
     return entity

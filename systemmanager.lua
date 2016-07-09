@@ -47,7 +47,7 @@ end
 
 -- update all systems. call from your main loop.
 function SystemManager:update( dt )
-    for system in self.update_systems do
+    for _, system in ipairs( self.update_systems ) do
         system:update( dt )
     end
 end
@@ -55,7 +55,9 @@ end
 -- call any systems that do drawing. Won't call the rest.
 -- call from your main loop.
 function SystemManager:draw()
-    for system in self.draw_systems do
+    for _, system in ipairs( self.draw_systems ) do
         system:draw()
     end
 end
+
+return SystemManager
