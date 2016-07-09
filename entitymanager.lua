@@ -157,6 +157,7 @@ end
 
 -- internal method
 function EntityManager:_reapEntity( entity )
+    local id = entity.id
     -- remove components and indexes first.
     self:removeAllTagsFromEntity( entity )
     self:removeAllComponentsFromEntity( entity )
