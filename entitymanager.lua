@@ -225,7 +225,7 @@ function EntityManager:getEntitiesWithComponent( component_name )
     local matching_entities = {}
     if self.componented_entities[ component_name ] then
         for id, entity in pairs( self.componented_entities[ component_name ] ) do
-            table.insert( matching_entities, entity )
+            matching_entities[ #matching_entities + 1 ] = entity
         end
     end
 
@@ -249,7 +249,7 @@ function EntityManager:getEntitiesWithComponents( components )
         end
 
         if has_all then
-            table.insert( matching_entities, entity )
+            matching_entities[ #matching_entities + 1 ] = entity
         end
     end
 
@@ -336,7 +336,7 @@ function EntityManager:getEntitiesWithTag( tag_name )
     local matching_entities = {}
     if self.tagged_entities[ tag_name ] then
         for id, entity in pairs( self.tagged_entities[ tag_name ]  ) do
-            table.insert( matching_entities, entity )
+            matching_entities[ #matching_entities + 1 ] = entity
         end
     end 
 
