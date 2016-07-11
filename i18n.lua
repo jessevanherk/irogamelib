@@ -1,11 +1,21 @@
 -- this is a namespace more than it is a module.
 
-local I18n = {}
+local I18n = {
+    strings = {}
+}
 
 
 -- create new entity manager, pass in component data to use.
-function I18n.init( locale_strings )
-    I18n.strings = {}
+function I18n.init( locale_dir )
+    local locale_strings = {}
+    local files = love.filesystem.getDirectoryItems( locale_dir )
+
+    for _, filename in ipairs( files ) do
+        local locale_name = filename:match( "(.+).lua" )
+        locale_strings[ locale_name ] = require( locale_dir .. "." .. locale_name )
+        print( filename, locale_name, locale_strings[ locale_name ] )
+    end
+
     I18n.locale_strings = locale_strings
 end
 
@@ -36,5 +46,5 @@ function I18n.dstr( string )
     return string
 end
 
-
-return I18n
+-- return wrapper functions too
+return I18n, I18n.str, I18n.dstr
