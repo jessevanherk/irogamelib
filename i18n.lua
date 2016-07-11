@@ -13,7 +13,6 @@ function I18n.init( locale_dir )
     for _, filename in ipairs( files ) do
         local locale_name = filename:match( "(.+).lua" )
         locale_strings[ locale_name ] = require( locale_dir .. "." .. locale_name )
-        print( filename, locale_name, locale_strings[ locale_name ] )
     end
 
     I18n.locale_strings = locale_strings
