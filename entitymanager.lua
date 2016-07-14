@@ -77,6 +77,8 @@ function EntityManager:createEntity( template_name, component_overrides, tags )
 
         -- tag it with the template used, since that's the most common use for tags.
         self:addTagToEntity( entity, template_name )
+    elseif template_name then -- specified a template, but can't find it
+        error( "unknown entity template '" .. template_name .. "'" )
     else
         -- no template, just use the component defaults as well as the instance-specific overrides
         self:addComponentsToEntity( entity, component_overrides )
