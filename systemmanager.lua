@@ -21,6 +21,7 @@ function SystemManager:_init( systems, system_prefix )
     -- these are automatically populated based on whether the system has update() or draw() functions.
     self.update_systems = {}
     self.draw_systems = {}
+    self.systems = {}
 
     for _, system_name in ipairs( systems ) do
         self:addSystem( system_name )
@@ -43,6 +44,7 @@ function SystemManager:addSystem( system_name )
         table.insert( self.draw_systems, system )
     end
 
+    self.systems[ system_name ] = system
 end
 
 -- update all systems. call from your main loop.
