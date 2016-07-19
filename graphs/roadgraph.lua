@@ -21,9 +21,10 @@ function RoadGraph:_init( width, height, values )
     for j = 1, height do
         self.values[ j ] = {}
         for i = 1, width do
-            if values[ j ][ i ] then
+            if values and values[ j ] and values[ j ][ i ] then
                 self.values[ j ][ i ] = values[ j ][ i ]
             end
+            -- else leave it as nil, so we can have a sparse array.
         end
     end
 end
@@ -138,6 +139,20 @@ function RoadGraph:getNeighbours( point )
     end
 
     return neighbours
+end
+
+function RoadGraph:getNeighbourValues( point )
+    local x = point[ 1 ]
+    local y = point[ 2 ]
+
+    local neighbours = self:getNeighbours( point )
+
+    local values = {}
+    for _, neighbour in pairs( neighbours ) do
+        table.insert( values, self:get( neighbour ) )
+    end
+
+    return values
 end
 
 return RoadGraph

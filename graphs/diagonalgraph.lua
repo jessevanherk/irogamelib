@@ -1,9 +1,9 @@
-local GridGraph = {}
+local DiagonalGraph = {}
 
 local abs = math.abs
 local min = math.min
 
-function GridGraph:new( ... )
+function DiagonalGraph:new( ... )
     local instance = {}
     setmetatable( instance, self )
     self.__index = self
@@ -11,7 +11,7 @@ function GridGraph:new( ... )
     return instance
 end
 
-function GridGraph:_init( width, height, values )
+function DiagonalGraph:_init( width, height, values )
     self.width  = width
     self.height = height
     self.values = {}
@@ -20,9 +20,10 @@ function GridGraph:_init( width, height, values )
     for j = 1, height do
         self.values[ j ] = {}
         for i = 1, width do
-            if values[ j ][ i ] then
+            if values and values[ j ] and values[ j ][ i ] then
                 self.values[ j ][ i ] = values[ j ][ i ]
             end
+            -- else leave it as nil, so we can have a sparse array.
         end
     end
 end
@@ -32,7 +33,7 @@ end
 -- where D is the cost to move orthoganally, and D2 is the cost to move diagonally.
 -- chebyshev distance - assumes diagonal distance cost is also 1.
 -- octile distance is better: D2 = 1.41
-function GridGraph:getHeuristic( node, goal )
+function DiagonalGraph:getHeuristic( node, goal )
     local dx = abs( node[ 1 ] - goal[ 1 ] )
     local dy = abs( node[ 2 ] - goal[ 2 ] )
     local h = ( dx + dy ) - 0.58579 * min( dx, dy )
@@ -42,7 +43,7 @@ function GridGraph:getHeuristic( node, goal )
 end
 
 -- get cost to move from current node to target node
-function GridGraph:getCost( current, target )
+function DiagonalGraph:getCost( current, target )
     -- for now, all movement costs are 1.
     local cost = 1
 
@@ -55,8 +56,8 @@ function GridGraph:getCost( current, target )
     return cost
 end
 
-
-function GridGraph:getNeighbours( point )
+-- return a list of neighbour positions in no particular order
+function DiagonalGraph:getNeighbours( point )
     local neighbours = {}
 
     local x = point[ 1 ]
@@ -106,4 +107,18 @@ function GridGraph:getNeighbours( point )
     return neighbours
 end
 
-return GridGraph
+function DiagonalGraph:getNeighbourValues( point )
+    local x = point[ 1 ]
+    local y = point[ 2 ]
+
+    local neighbours = self:getNeighbours( point )
+
+    local values = {}
+    for _, neighbour in pairs( neighbours ) do
+        table.insert( values, self:get( neighbour ) )
+    end
+
+    return values
+end
+
+return DiagonalGraph

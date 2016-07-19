@@ -71,7 +71,7 @@ function GridGraph:getCost( current, target )
     return cost
 end
 
-
+-- return a list of neighbour positions in no particular order
 function GridGraph:getNeighbours( point )
     local neighbours = {}
 
@@ -97,6 +97,20 @@ function GridGraph:getNeighbours( point )
     end
 
     return neighbours
+end
+
+function GridGraph:getNeighbourValues( point )
+    local x = point[ 1 ]
+    local y = point[ 2 ]
+
+    local neighbours = self:getNeighbours( point )
+
+    local values = {}
+    for _, neighbour in pairs( neighbours ) do
+        table.insert( values, self:get( neighbour ) )
+    end
+
+    return values
 end
 
 return GridGraph
