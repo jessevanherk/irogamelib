@@ -25,6 +25,17 @@ local component_templates = {
             idle = { 'f01', 'f02' },
         },
     },
+    complex = {
+        nested = {
+            tables = {
+                are = {
+                    difficult = { 
+                        values = { 3, 1, 4, 1, 5, 9 },
+                    },
+                },
+            },
+        },
+    },
 }
 local entity_templates = { 
     rock = {
@@ -36,6 +47,7 @@ local entity_templates = {
         position = {},
         hitbox = { shape = 'circle' },
         animation = {},
+        complex = {},
     },
 
 }
@@ -79,6 +91,29 @@ describe( "EntityManager library", function()
             local result = results[ 2 ]
             assert.is_equal( expected2.id, result.id )
             assert.is_equal( 2, #results )
+        end)
+    end)
+    describe( "should properly instance templates, avoid aliasing", function()
+        local EM = EntityManager:new( entity_templates, component_templates )
+        local e1 = EM:createEntity( 'person' )
+        local e2 = EM:createEntity( 'person' )
+        it( "creates different top level entities", function()
+            assert.is_not_equal( e1, e2 )
+        end)
+        it( "allows for changing simple component values", function()
+            e2.identity.first_name = 'Alice'
+            assert.is_equal( 'Bob', e1.identity.first_name )
+            assert.is_equal( 'Alice', e2.identity.first_name )
+        end)
+        it( "allows for changing nested component values", function()
+            e2.animation.frames.idle[ 1 ] = 'OTHER1'
+            assert.is_equal( 'f01', e1.animation.frames.idle[ 1 ] )
+            assert.is_equal( 'OTHER1', e2.animation.frames.idle[ 1 ] )
+        end)
+        it( "allows for changing deep nested component table values", function()
+            table.remove( e2.complex.nested.tables.are.difficult.values, 2 )
+            assert.is_equal( 4, e1.complex.nested.tables.are.difficult.values[ 3 ] )
+            assert.is_equal( 5, e2.complex.nested.tables.are.difficult.values[ 4 ] )
         end)
     end)
 end)
