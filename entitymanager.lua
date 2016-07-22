@@ -196,7 +196,7 @@ function EntityManager:addComponentToEntity( entity, component_name, overrides )
         plog( "unknown component '" .. component_name .. "'. Check for typos?" )
     end
 
-    -- override with any values that were passed in
+    -- override with any values that were passed in. these may come from the entity template.
     for key, override in pairs( overrides ) do
         entity[ component_name ][ key ] = override
     end
