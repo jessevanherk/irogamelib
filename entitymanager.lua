@@ -190,15 +190,11 @@ function EntityManager:addComponentToEntity( entity, component_name, overrides )
 
     if self.component_templates[ component_name ] ~= nil then
         -- deep-copy the component template onto the entity
-        entity[ component_name ] = deepcopy( self.component_templates[ component_name ] )
+        -- override with any values that were passed in. these may be coming from the entity template.
+        entity[ component_name ] = deepmerge( self.component_templates[ component_name ], overrides )
     else
         -- this is only an informative message.
         plog( "unknown component '" .. component_name .. "'. Check for typos?" )
-    end
-
-    -- override with any values that were passed in. these may come from the entity template.
-    for key, override in pairs( overrides ) do
-        entity[ component_name ][ key ] = override
     end
 
     -- add this entity to the index so we can quickly find it
