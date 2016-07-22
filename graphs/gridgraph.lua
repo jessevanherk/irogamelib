@@ -92,7 +92,7 @@ function GridGraph:getNeighbours( point )
     if y > 1 then
         table.insert( neighbours, north )
     end
-    if y < self.width then
+    if y < self.height then
         table.insert( neighbours, south )
     end
 
