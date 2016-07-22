@@ -30,7 +30,7 @@ local component_templates = {
             tables = {
                 are = {
                     difficult = { 
-                        values = { 3, 1, 4, 1, 5, 9 },
+                        values = { 'o', 'm', 'g', 'becky', 'look', 'at', 'her' },
                     },
                 },
             },
@@ -47,9 +47,18 @@ local entity_templates = {
         position = {},
         hitbox = { shape = 'circle' },
         animation = {},
-        complex = {},
+        complex = {
+            nested = { 
+                tables = {
+                    are = {
+                        difficult = { 
+                            values = { 3, 1, 4, 1, 5, 9 },
+                        },
+                    },
+                },
+            },
+        },
     },
-
 }
 
 require( "utils" )
