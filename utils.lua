@@ -82,7 +82,7 @@ end
 function kpairs( t, f )
     local a = {}
     -- flatten the keys
-    for n in pairs( t ) do table.insert( a, n ) end
+    for n in pairs( t ) do a[ #a + 1 ] = n end
     -- sort the keys
     table.sort( a, f )
     local i = 0      -- iterator variable
@@ -93,4 +93,12 @@ function kpairs( t, f )
         end
     end
     return iter
+end
+
+function table_keys( t )
+    local keys = {}
+    for key, _ in ipairs( t ) do
+        keys[ #keys + 1 ] = key
+    end
+    return keys
 end
