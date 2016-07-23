@@ -2,6 +2,7 @@
 
 -- convert a single int number into an RGB triplet
 -- for sanity, pass in as a hex number, eg. rgb( 0xc1c1c1 )
+-- return as a TABLE now.
 function rgb( colour )
     local r, g, b
     if ( colour > 0xffffff ) then
@@ -10,7 +11,7 @@ function rgb( colour )
     r = math.floor(   colour / 65536 )
     g = math.floor( ( colour % 65536 ) / 256 )
     b = colour % 256
-    return r, g, b
+    return { r, g, b }
 end
 
 -- same as rgb(), but 2 extra bytes at the end for alpha.
@@ -20,8 +21,8 @@ function rgba( colour )
     -- can't be clever with alpha, MUST assume last 2 bytes are alpha.
     a = colour % 256
     top_bytes = math.floor( colour / 256 )
-    r, g, b = rgb( top_bytes )
-    return r, g, b, a
+    r, g, b = unpack( rgb( top_bytes ) )
+    return { r, g, b, a }
 end
 
 -- perform a full deep copy on the given table

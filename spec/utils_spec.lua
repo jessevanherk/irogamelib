@@ -12,38 +12,38 @@ describe( "Utility library", function()
 
         it("should output a valid list for a 0 value", function()
             local input = 0
-            local r, g, b = rgb( input )
+            local result = rgb( input )
             local expected = { 0, 0, 0 }
-            assert.are.same( expected, { r, g, b } )
+            assert.are.same( expected, result )
         end)
 
         it("should output a valid list for an arbitrary value", function()
             local input = 0xaabbcc
-            local r, g, b = rgb( input )
+            local result = rgb( input )
             local expected = { 0xaa, 0xbb, 0xcc }
-            assert.are.same( expected, { r, g, b } )
+            assert.are.same( expected, result )
         end)
     end)
 
     describe( "rgba colour shortcut", function()
         it("should output a valid list for a 0 value", function()
             local input = 0
-            local r, g, b, a = rgba( input )
+            local result = rgba( input )
             local expected = { 0, 0, 0, 0 }
-            assert.are.same( expected, { r, g, b, a } )
+            assert.are.same( expected, result )
         end)
 
         it("should output a valid list for a value with full opacity", function()
             local input = 0xaabbccff
-            local r, g, b, a = rgba( input )
+            local result = rgba( input )
             local expected = { 0xaa, 0xbb, 0xcc, 0xff }
-            assert.are.same( expected, { r, g, b, a } )
+            assert.are.same( expected, result )
         end)
         it("should output a valid list for items with no red", function()
             local input = 0x00aabbcc
-            local r, g, b, a = rgba( input )
+            local result = rgba( input )
             local expected = { 0x00, 0xaa, 0xbb, 0xcc }
-            assert.are.same( expected, { r, g, b, a } )
+            assert.are.same( expected, result )
         end)
     end)
 
