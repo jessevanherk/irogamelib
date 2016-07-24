@@ -97,7 +97,7 @@ end
 
 function table_keys( t )
     local keys = {}
-    for key, _ in ipairs( t ) do
+    for key, _ in pairs( t ) do
         keys[ #keys + 1 ] = key
     end
     return keys

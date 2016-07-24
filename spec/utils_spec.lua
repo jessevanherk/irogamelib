@@ -4,7 +4,7 @@
 require( 'utils' )
 
 describe( "Utility library", function()
-    describe( "rgb colour shortcut", function()
+    describe( "rgb()", function()
         it( "errors on too large of input", function()
             local input = 0x1000000
             assert.has_error( function() rgb( input ) end, "colour too big for rgb() - use rgba() instead?")
@@ -25,7 +25,7 @@ describe( "Utility library", function()
         end)
     end)
 
-    describe( "rgba colour shortcut", function()
+    describe( "rgba()", function()
         it("should output a valid list for a 0 value", function()
             local input = 0
             local result = rgba( input )
@@ -47,7 +47,7 @@ describe( "Utility library", function()
         end)
     end)
 
-    describe( "should have deepcopy function", function()
+    describe( "deepcopy()", function()
         it("should copy a nil value", function()
             local input = nil
             local result = deepcopy( input )
@@ -69,7 +69,7 @@ describe( "Utility library", function()
         end)
     end)
 
-    describe( "has a deepmerge function for table merges", function()
+    describe( "deepmerge()", function()
         it("returns original target if not merging a table", function()
             local input = 'notatable'
             local target = { a = 'foo' }
@@ -96,6 +96,26 @@ describe( "Utility library", function()
             local target = { a = 'foo', c = { e = 'qux' } }
             local result = deepmerge( target, input )
             local expected = { a = 'foo', b = 'bar', c = { d = 'baz', e = 'new' } }
+            assert.are.same( expected, result )
+        end)
+    end)
+    describe( "table_keys()", function()
+        it( "returns an empty set on empty input", function()
+            local input = {}
+            local expected = {}
+            local result = table_keys( input )
+            assert.are.same( expected, result )
+        end)
+        it( "returns integer keys for basic list", function()
+            local input = { 'foo', 'bar', 'baz'}
+            local expected = { 1, 2, 3 }
+            local result = table_keys( input )
+            assert.are.same( expected, result )
+        end)
+        it( "returns hash keys for hash", function()
+            local input = { a = 'foo', c = 'bar', b = 'baz'}
+            local expected = { 'a', 'c', 'b' }
+            local result = table_keys( input )
             assert.are.same( expected, result )
         end)
     end)
