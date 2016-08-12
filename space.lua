@@ -22,7 +22,7 @@ function Space:_init( entity_templates, component_templates, systems, system_pre
     self.timer  = Timer.new()
 
     self.entity_manager = EntityManager:new( entity_templates, component_templates, self.onCreatedEntity )
-    self.system_manager = SystemManager:new( systems, system_prefix )
+    self.system_manager = SystemManager:new( systems, system_prefix, self )
 end
 
 -- should be called once in the update callback.

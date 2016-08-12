@@ -15,7 +15,7 @@ function SystemManager:new( ... )
     return instance
 end
 
-function SystemManager:_init( systems, system_prefix )
+function SystemManager:_init( systems, system_prefix, space )
     self.system_prefix = system_prefix or "lib.systems."
 
     -- these are automatically populated based on whether the system has update() or draw() functions.
@@ -24,17 +24,18 @@ function SystemManager:_init( systems, system_prefix )
     self.systems = {}
 
     for _, system_name in ipairs( systems ) do
-        self:addSystem( system_name )
+        self:addSystem( system_name, space )
     end
 end
 
-function SystemManager:addSystem( system_name )
+function SystemManager:addSystem( system_name, space )
     assert( system_name, "must specify system name" )
     local system_file = self.system_prefix .. system_name:lower()
 
     system_lib = require( system_file )
 
-    local system = system_lib:new()
+    -- instantiate it, passing in a reference to its space (if any)
+    local system = system_lib:new( space )
 
     if system.update then
         table.insert( self.update_systems, system )
