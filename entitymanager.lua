@@ -132,7 +132,7 @@ end
 
 -- deleteEntity( entity )
 -- mark an existing entity for deletion. okay to call from systems/callbacks.
--- note that the entity will not actually be deleted until EntityManager:reapDeleted() 
+-- note that the entity will not actually be deleted until reapEntities() 
 -- is called. 
 function EntityManager:deleteEntity( entity )
     -- just flag the entity as deleted. 
@@ -144,6 +144,11 @@ function EntityManager:deleteAllEntities()
         self:deleteEntity( entity )
     end
     self:reapEntities()
+
+    -- since we've deleted everything, clear out all indices.
+    self.entities = {}
+    self.tagged_entities = {}
+    self.componented_entities = {}
 end
 
 -- reapEntities()
@@ -317,7 +322,7 @@ end
 -- removeAllTagsFromEntity( entity )
 --  clear out all tags from the entity. used by reap/etc.
 function EntityManager:removeAllTagsFromEntity( entity )
-    for _, tag_name in ipairs( entity.tags ) do
+    for tag_name, _ in pairs( entity.tags ) do
         self:removeTagFromEntity( entity, tag_name )
     end
 end
@@ -338,7 +343,7 @@ function EntityManager:removeTagFromEntity( entity, tag_name )
         return -- success, ish.
     end
     -- clear it off of the entity itself.
-    entity[ tag_name ] = nil
+    entity.tags[ tag_name ] = nil
 
     -- remove the entity from the index for that tag
     if self.tagged_entities[ tag_name ] then
