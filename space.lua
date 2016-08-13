@@ -61,7 +61,7 @@ end
 -- simple callback to tell systems/etc they need to do something.
 -- OVERRIDE this as needed.
 function Space:onCreatedEntity( entity )
-    self.signal:emit( "created_entity", entity )
+    --self.signal:emit( "created_entity", entity )
 end
 
 return Space
