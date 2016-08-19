@@ -6,5 +6,6 @@ This is a set of useful libraries for developing games using Lua and Love2d.  It
 - 2D pathfinding  (Astar) on arbitrary graphs
 - Utility libraries
 - Queue/Stack and Priority Queue implementations
+- basic Internationalization (i18n) library
 
 Released under the MIT license. See LICENSE for details.
