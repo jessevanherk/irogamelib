@@ -2,7 +2,7 @@
 Usage:
   new( comparator ):
       comparator (optional): Use this function to compare values.
-            Default sorts numerically, putting lower numbers at the start of the queue.
+            Default sorts numerically, putting HIGHEST numbers at the start of the queue.
             Comparator takes two values and returns true if the first should be further up, false otherwise
   new( comparator, values, priorities ):
       comparator: same as above. nil to use default comparator.
@@ -12,7 +12,6 @@ Usage:
   push( value, priority ): push a new item onto the PriorityQueue
   pop():   Get and remove the highest priority value from the queue
   peek():  Get the highest priority value from the queue but don't remove it. returns nil if queue is empty
-  getTables(): Return two tables, first is values second is priorities.
   clear(): clear the PriorityQueue
   print( show_priorities ): prints out all the elements in the PriorityQueue
       show_priorities: If true, also print the priorities
@@ -34,12 +33,8 @@ function PriorityQueue:new( ... )
     return instance
 end
 
-function PriorityQueue:defaultCompare( a, b )
-    if a > b then
-        return true
-    else
-        return false
-    end
+function PriorityQueue.defaultCompare( a, b )
+    return a < b
 end
 
 function PriorityQueue:_init( comparator, values, priorities )
@@ -76,8 +71,8 @@ function PriorityQueue:siftUp( index )
     local parent_index
     if index ~= 1 then
         parent_index = floor( index / 2 )
-        if self:compare( self.priorities[ parent_index ], self.priorities[ index ] ) then
-            -- swap the items. MUST be done as list assignment to avoid temp variables.
+        if self.compare( self.priorities[ parent_index ], self.priorities[ index ] ) then
+            -- swap the items. done as list assignment to avoid temp variables.
             self.values[ parent_index ], self.values[ index ] = self.values[ index ], self.values[ parent_index ]
             self.priorities[ parent_index ], self.priorities[ index ] = self.priorities[ index ], self.priorities[ parent_index ]
 
@@ -98,15 +93,15 @@ function PriorityQueue:siftDown( index )
             min_index = left_index
         end
     else
-        if not self:compare( self.priorities[ left_index ], self.priorities[ right_index ] ) then
+        if not self.compare( self.priorities[ left_index ], self.priorities[ right_index ] ) then
             min_index = left_index
         else
             min_index = right_index
         end
     end
     
-    if self:compare( self.priorities[ index ], self.priorities[ min_index ] ) then
-        -- swap the items. MUST be done as list assignment to avoid temp variables.
+    if self.compare( self.priorities[ index ], self.priorities[ min_index ] ) then
+        -- swap the items. done as list assignment to avoid temp variables.
         self.values[ min_index ], self.values[ index ] = self.values[ index ], self.values[ min_index ]
         self.priorities[ min_index ], self.priorities[ index ] = self.priorities[ index ], self.priorities[ min_index ]
 
@@ -116,10 +111,15 @@ function PriorityQueue:siftDown( index )
 end
 
 function PriorityQueue:push( value, priority )
+    if not value then
+        return
+    end
+
     table.insert( self.values, value )
     table.insert( self.priorities, priority )
     
     if #self.values <= 1 then
+        -- don't need to sift if only one item
         return
     end
     
@@ -155,20 +155,15 @@ function PriorityQueue:peek()
     end
 end
 
-function PriorityQueue:getTables()
-    if not self.values or #self.values < 1 then
-        return nil, nil
+-- return all values in sorted order. empties the list!!!
+function PriorityQueue:popAll()
+    local sorted = {}
+    while not self:isEmpty() do
+        local item = self:pop()
+        table.insert( sorted, #sorted + 1, item )
     end
-    
-    local values = { }
-    local priorities = { }
-    
-    for i = 1, #self.values do
-        table.insert( values, self.values[ i ] )
-        table.insert( priorities, self.priorities[ i ] )
-    end
-    
-    return values, priorities
+
+    return sorted
 end
 
 function PriorityQueue:clear()
@@ -180,17 +175,18 @@ function PriorityQueue:clear()
     end
 end
 
+-- NOTE that this does not do sorting - this prints them in memory order!!
 function PriorityQueue:print( show_priorities )
-    if not show_priorities then
+    if show_priorities then
         local output = ""
         for i = 1, #self.values do
-            output = output .. tostring(self.values[i]) .. " "
+            output = output .. tostring(self.values[i]) .. "(" .. tostring(self.priorities[i]) .. ")\n"
         end
         print(output)
     else
         local output = ""
         for i = 1, #self.values do
-            output = output .. tostring(self.values[i]) .. "(" .. tostring(self.priorities[i]) .. ") "
+            output = output .. tostring(self.values[i]) .. "\n"
         end
         print(output)
     end

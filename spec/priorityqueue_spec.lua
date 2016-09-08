@@ -38,17 +38,15 @@ describe( "PriorityQueue", function()
             end)
         end)
         context( "when values and priorities are provided", function()
-            local values = { 'foo', 'bar', 'baz' }
-            local priorities = { 5, 12, 2 }
+            local values = { 'mouse', 'cat', 'elephant', 'dog' }
+            local priorities = { 3, 5, 1, 10 }
             local q = PriorityQueue:new( nil, values, priorities )
-            it( "has the values", function()
-                assert.is.same( { 'baz', 'foo', 'bar' }, q.values )
-            end)
-            it( "has the priorities", function()
-                assert.is.same( { 12, 5, 2 }, q.priorities )
-            end)
-            it( "uses the specified comparator", function()
+            local result = q:popAll()
+            it( "uses the default comparator", function()
                 assert.is.same( q.defaultCompare, q.compare )
+            end)
+            it( "sorted values correctly", function()
+                assert.is.same( { 'dog', 'cat', 'mouse', 'elephant' }, result )
             end)
         end)
     end)
@@ -56,34 +54,51 @@ describe( "PriorityQueue", function()
         context( "when queue is empty", function()
             local q = PriorityQueue:new()
             q:push( 'foof', 4 )
+            local result = q:popAll()
             it( "has the value", function()
-                local result = q.values[ 1 ]
-                local expected = 'foof'
+                local expected = { 'foof' }
                 assert.is.same( expected, result )
             end)
-            it( "has the priority", function()
-                local result = q.priorities[ 1 ]
-                local expected = 4
-                assert.is.same( expected, result )
+        end)
+        context( "when inserting a nil", function()
+            local q = PriorityQueue:new( nil, { 'bar', 'foo' }, { 2, 10 } )
+            local old_size = q:size()
+            q:push( nil, 10 )
+            it( "doesn't change size", function()
+                assert.is_equal( old_size, q:size() )
+            end)
+            it( "pops the previous best", function()
+                local result = q:pop()
+                assert.is_equal( 'foo', result )
             end)
         end)
         context( "when inserting into the middle", function()
-            local q = PriorityQueue:new(nil, { 'foo', 'bar' }, { 6, 2 } )
-            it( "has the new value in the right place", function()
-                q:push( 'baz', 5 ) -- try getting it in the middle
-                local result = q.values[ 2 ]
-                local expected = 'baz'
-                assert.is.same( expected, result )
-            end)
-            it( "has the other items in the right place", function()
-                result = q.values[ 3 ]
-                expected = 'foo'
-                assert.is.same( expected, result )
+            local q = PriorityQueue:new( nil, { 'bar', 'foo' }, { 2, 12 } )
+            q:push( 'baz', 5 ) -- try getting it in the middle
+            local results = q:popAll()
+            it( "has the items in the right order", function()
+                local expected = { 'foo', 'baz', 'bar' }
+                assert.is.same( expected, results )
             end)
         end)
         context( "when there is a tie", function()
+            local q = PriorityQueue:new( nil, { 'bar', 'foo' }, { 2, 12 } )
+            q:push( 'baz', 12 ) -- try getting it in the middle
+            local results = q:popAll()
             it( "gives the original item higher priority", function()
-                assert.is_nil( 'FAILME' )
+                local expected = { 'foo', 'baz', 'bar' }
+                assert.is.same( expected, results )
+            end)
+        end)
+        context( "when min comparator is specified", function()
+            -- lower numbers get higher priority
+            local comparator = function( a, b ) return a > b end
+            local q = PriorityQueue:new( comparator, { 'bar', 'foo' }, { 2, 12 } )
+            q:push( 'baz', 22 )
+            local results = q:popAll()
+            it( "sorts lower numbers first", function()
+                local expected = { 'bar', 'foo', 'baz' }
+                assert.is.same( expected, results )
             end)
         end)
     end)
@@ -236,33 +251,6 @@ describe( "PriorityQueue", function()
             end)
             it( "doesn't change queue size", function()
                 assert.is.same( q:size(), 1 )
-            end)
-        end)
-    end)
-    describe( "getTables()", function()
-        context( "when queue is empty", function()
-            local q = PriorityQueue:new()
-            local result_v, result_p = q:getTables()
-            it( "return nils", function()
-                local expected_v = nil
-                local expected_p = nil
-                assert.is.same( expected_v, result_v )
-                assert.is.same( expected_p, result_p )
-            end)
-        end)
-        context( "when queue is not empty", function()
-            local q = PriorityQueue:new()
-            q:push( 'foo', 2 )
-            q:push( 'bar', 3 )
-            q:push( 'baz', 9 )
-            q:push( 'qux', 1 )
-            q:pop()
-            local result_v, result_p = q:getTables()
-            it( "return correct tables for filled queue", function()
-                local expected_v = { 'bar', 'foo', 'qux' }
-                local expected_p = { 3, 2, 1 }
-                assert.is.same( expected_v, result_v )
-                assert.is.same( expected_p, result_p )
             end)
         end)
     end)
