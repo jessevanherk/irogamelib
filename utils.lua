@@ -47,7 +47,7 @@ end
 function deepmerge( base, overrides )
     local target = {}
     if type( overrides ) ~= 'table' then
-        return base
+        return deepcopy( base )
     end
 
     local keys = {}
