@@ -62,9 +62,11 @@ function List:isEmpty()
 end
 
 function List:push( value )
-    local last = self.last + 1
-    self.last = last
-    self[ last ] = value
+    if value then
+        local last = self.last + 1
+        self.last = last
+        self[ last ] = value
+    end
 end
 
 function List:pop()
