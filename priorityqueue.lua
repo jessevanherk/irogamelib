@@ -45,6 +45,7 @@ end
 function PriorityQueue:_init( comparator, values, priorities )
     self.compare = self.defaultCompare
     if comparator then
+        assert( type( comparator ) == 'function', "comparator must be a function" )
         self.compare = comparator
     end
     
