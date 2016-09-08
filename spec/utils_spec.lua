@@ -5,7 +5,7 @@ require( 'utils' )
 
 describe( "Utils", function()
     describe( "rgb()", function()
-        describe( "when input is too large", function()
+        context( "when input is too large", function()
             local input = 0x1000000
             it( "throws an error", function()
                 local expected = "colour too big for rgb() - use rgba() instead?"
@@ -13,7 +13,7 @@ describe( "Utils", function()
             end)
         end)
 
-        describe( "when value is 0", function()
+        context( "when value is 0", function()
             local input = 0
             local result = rgb( input )
             it("returns a zero list", function()
@@ -22,7 +22,7 @@ describe( "Utils", function()
             end)
         end)
 
-        describe( "when value is in-range", function()
+        context( "when value is in-range", function()
             local input = 0xaabbcc
             local result = rgb( input )
             it("returns the expected values", function()
@@ -33,7 +33,7 @@ describe( "Utils", function()
     end)
 
     describe( "rgba()", function()
-        describe( "when value is 0", function()
+        context( "when value is 0", function()
             local input = 0
             local result = rgba( input )
             it("returns a zero list", function()
@@ -42,7 +42,7 @@ describe( "Utils", function()
             end)
         end)
 
-        describe( "when opacity is zero", function()
+        context( "when opacity is zero", function()
             local input = 0xaabbcc00
             local result = rgba( input )
             it("returns the expected colours and opacity", function()
@@ -51,7 +51,7 @@ describe( "Utils", function()
             end)
         end)
 
-        describe( "when opacity is full", function()
+        context( "when opacity is full", function()
             local input = 0xaabbccff
             local result = rgba( input )
             it("returns the expected colours and opacity", function()
@@ -60,7 +60,7 @@ describe( "Utils", function()
             end)
         end)
 
-        describe( "When high bits are zero", function()
+        context( "When high bits are zero", function()
             local input = 0x00aabbcc
             local result = rgba( input )
             it("returns the expected colours and opacity", function()
@@ -71,7 +71,7 @@ describe( "Utils", function()
     end)
 
     describe( "deepcopy()", function()
-        describe( "when value is nil", function()
+        context( "when value is nil", function()
             local input = nil
             local result = deepcopy( input )
             it("returns a nil value", function()
@@ -79,7 +79,7 @@ describe( "Utils", function()
                 assert.are.same( expected, result )
             end)
         end)
-        describe( "when value is a scalar string", function()
+        context( "when value is a scalar string", function()
             local input = "hello world"
             local result = deepcopy( input )
             it("returns the string", function()
@@ -87,7 +87,7 @@ describe( "Utils", function()
                 assert.are.same( expected, result ) -- same value
             end)
         end)
-        describe( "when value is a simple table", function()
+        context( "when value is a simple table", function()
             local input = { 1, 2, 3 }
             local result = deepcopy( input )
             it("returns the same values", function()
@@ -98,7 +98,7 @@ describe( "Utils", function()
                 assert.are_not_equal( input, result ) -- different memory location
             end)
         end)
-        describe( "when value is a complex table", function()
+        context( "when value is a complex table", function()
             local input = { a = 3, b = "something", c = { c1 = 'foo', c2 = 'bar' } }
             input[ 2 ] = 42  -- add a numeric index too
             local result = deepcopy( input )
@@ -120,7 +120,7 @@ describe( "Utils", function()
     end)
 
     describe( "deepmerge()", function()
-        describe( "when overrides is nil", function()
+        context( "when overrides is nil", function()
             local overrides = nil
             local target = { a = 'foo' }
             local result = deepmerge( target, overrides )
@@ -131,7 +131,7 @@ describe( "Utils", function()
                 assert.are.equal( target.a, result.a )
             end)
         end)
-        describe( "when overrides is a non-nil scalar", function()
+        context( "when overrides is a non-nil scalar", function()
             local overrides = 'notatable'
             local target = { a = 'foo' }
             local result = deepmerge( target, overrides )
@@ -142,7 +142,7 @@ describe( "Utils", function()
                 assert.are.equal( target.a, result.a )
             end)
         end)
-        describe( "when overrides is an empty table", function()
+        context( "when overrides is an empty table", function()
             local overrides = {}
             local target = { a = 'foo' }
             local result = deepmerge( target, overrides )
@@ -153,7 +153,7 @@ describe( "Utils", function()
                 assert.are.equal( target.a, result.a )
             end)
         end)
-        describe( "when overrides is a simple table", function()
+        context( "when overrides is a simple table", function()
             local overrides = { b = 'bar', c = 'baz' }
             local target = { a = 'foo' }
             local result = deepmerge( target, overrides )
@@ -165,20 +165,20 @@ describe( "Utils", function()
                 assert.are.same( expected, result )
             end)
         end)
-        describe( "when overrides has non-conflicting children", function()
+        context( "when overrides has non-conflicting children", function()
             local overrides = { b = 'bar', c = { d = 'baz' } }
             local target = { a = 'foo', c = { e = 'qux' } }
             local result = deepmerge( target, overrides )
-            it("returns merged values", function()
+            it("returns all merged values", function()
                 local expected = { a = 'foo', b = 'bar', c = { d = 'baz', e = 'qux' } }
                 assert.are.same( expected, result )
             end)
         end)
-        describe( "when overrides has conflicting children", function()
+        context( "when overrides has conflicting children", function()
             local overrides = { b = 'bar', c = { d = 'baz', e = 'new' } }
             local target = { a = 'foo', c = { e = 'qux' } }
             local result = deepmerge( target, overrides )
-            it("returns overridden values", function()
+            it("gives overrides precedence", function()
                 local expected = { a = 'foo', b = 'bar', c = { d = 'baz', e = 'new' } }
                 assert.are.same( expected, result )
             end)
@@ -186,7 +186,7 @@ describe( "Utils", function()
     end)
 
     describe( "table_keys()", function()
-        describe( "when input is empty", function()
+        context( "when input is empty", function()
             local input = {}
             local result = table_keys( input )
             it( "returns an empty list", function()
@@ -194,7 +194,7 @@ describe( "Utils", function()
                 assert.are.same( expected, result )
             end)
         end)
-        describe( "when input is a basic list", function()
+        context( "when input is a basic list", function()
             local input = { 'foo', 'bar', 'baz'}
             local result = table_keys( input )
             it( "returns integer keys", function()
@@ -202,7 +202,7 @@ describe( "Utils", function()
                 assert.are.same( expected, result )
             end)
         end)
-        describe( "when input is a pure hash", function()
+        context( "when input is a pure hash", function()
             local input = { a = 'foo', c = 'bar', b = 'baz'}
             local result = table_keys( input )
             it( "returns hash keys", function()
@@ -210,7 +210,7 @@ describe( "Utils", function()
                 assert.are.same( expected, result )
             end)
         end)
-        describe( "when input is a mixed list/hash", function()
+        context( "when input is a mixed list/hash", function()
             local input = { a = 'foo', d = 'bar', b = 'baz'}
             input[ 2 ] = 'qux'
             input[ 4 ] = 'quux'
