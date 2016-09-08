@@ -95,6 +95,36 @@ function kpairs( t, f )
     return iter
 end
 
+-- custom iterator to sort a table by whatever.
+-- basic example, just sort by the keys
+-- for k,v in spairs(HighScore) do print(k,v) end
+-- fancy example, custom sort by score descending
+--for k,v in spairs(HighScore, function(t,a,b) return t[b] < t[a] end) do print(k,v) end
+function spairs( t, order_cb )
+    -- collect the keys
+    local keys = {}
+    for k in pairs( t ) do keys[ #keys + 1 ] = k end
+
+    -- if order function given, sort by it by passing the table and keys a, b,
+    -- otherwise just sort the keys 
+    if order then
+        table.sort( keys, function( a, b ) return order_cb( t, a, b ) end )
+    else
+        table.sort( keys )
+    end
+
+    -- return the iterator function
+    local i = 0
+    return function()
+        i = i + 1
+        if keys[ i ] then
+            return keys[ i ], t[ keys[ i ] ]
+        end
+    end
+end
+
+
+
 function table_keys( t )
     local keys = {}
     for key, _ in pairs( t ) do
@@ -102,3 +132,18 @@ function table_keys( t )
     end
     return keys
 end
+
+--[[
+-- single variable linear interpolation.
+function lerp( val0, val1, t )
+    return val0 + t * ( val1 - val0 )
+end
+
+-- bilinear interpolation
+function blerp( tx, ty, val00, val10, val01, val11 )
+    local temp1 = lerp( val00, cal10, tx )
+    local temp2 = lerp( val01, cal11, tx )
+    return lerp( temp1, temp2, ty )
+end
+]]--
+

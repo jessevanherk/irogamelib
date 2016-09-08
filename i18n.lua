@@ -29,10 +29,18 @@ end
 
 -- main translation function. 
 -- this should be used ANY time you are OUTPUTTING a string. See dstr for data files though.
-function I18n.str( string )
+-- params is a list of variables to sub in.
+-- the string template should look like:
+--    "hello {1}, welcome to {2}."
+function I18n.str( string, params )
     local translation = string
     if I18n.strings[ string ] then
         translation = I18n.strings[ string ]
+    end
+
+    -- super awesome lua code to replace all params at once.
+    if params then
+        return translation:gsub( "{(%d+)}", function( i ) return params[ tonumber( i ) ] or "" end )
     end
 
     return translation
