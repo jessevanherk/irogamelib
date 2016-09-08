@@ -3,120 +3,227 @@
 --
 require( 'utils' )
 
-describe( "Utility library", function()
+describe( "Utils", function()
     describe( "rgb()", function()
-        it( "errors on too large of input", function()
+        describe( "when input is too large", function()
             local input = 0x1000000
-            assert.has_error( function() rgb( input ) end, "colour too big for rgb() - use rgba() instead?")
+            it( "throws an error", function()
+                local expected = "colour too big for rgb() - use rgba() instead?"
+                assert.has_error( function() rgb( input ) end, expected )
+            end)
         end)
 
-        it("should output a valid list for a 0 value", function()
+        describe( "when value is 0", function()
             local input = 0
             local result = rgb( input )
-            local expected = { 0, 0, 0 }
-            assert.are.same( expected, result )
+            it("returns a zero list", function()
+                local expected = { 0, 0, 0 }
+                assert.are.same( expected, result )
+            end)
         end)
 
-        it("should output a valid list for an arbitrary value", function()
+        describe( "when value is in-range", function()
             local input = 0xaabbcc
             local result = rgb( input )
-            local expected = { 0xaa, 0xbb, 0xcc }
-            assert.are.same( expected, result )
+            it("returns the expected values", function()
+                local expected = { 0xaa, 0xbb, 0xcc }
+                assert.are.same( expected, result )
+            end)
         end)
     end)
 
     describe( "rgba()", function()
-        it("should output a valid list for a 0 value", function()
+        describe( "when value is 0", function()
             local input = 0
             local result = rgba( input )
-            local expected = { 0, 0, 0, 0 }
-            assert.are.same( expected, result )
+            it("returns a zero list", function()
+                local expected = { 0, 0, 0, 0 }
+                assert.are.same( expected, result )
+            end)
         end)
 
-        it("should output a valid list for a value with full opacity", function()
+        describe( "when opacity is zero", function()
+            local input = 0xaabbcc00
+            local result = rgba( input )
+            it("returns the expected colours and opacity", function()
+                local expected = { 0xaa, 0xbb, 0xcc, 0x00 }
+                assert.are.same( expected, result )
+            end)
+        end)
+
+        describe( "when opacity is full", function()
             local input = 0xaabbccff
             local result = rgba( input )
-            local expected = { 0xaa, 0xbb, 0xcc, 0xff }
-            assert.are.same( expected, result )
+            it("returns the expected colours and opacity", function()
+                local expected = { 0xaa, 0xbb, 0xcc, 0xff }
+                assert.are.same( expected, result )
+            end)
         end)
-        it("should output a valid list for items with no red", function()
+
+        describe( "When high bits are zero", function()
             local input = 0x00aabbcc
             local result = rgba( input )
-            local expected = { 0x00, 0xaa, 0xbb, 0xcc }
-            assert.are.same( expected, result )
+            it("returns the expected colours and opacity", function()
+                local expected = { 0x00, 0xaa, 0xbb, 0xcc }
+                assert.are.same( expected, result )
+            end)
         end)
     end)
 
     describe( "deepcopy()", function()
-        it("should copy a nil value", function()
+        describe( "when value is nil", function()
             local input = nil
             local result = deepcopy( input )
-            local expected = nil
-            assert.are.same( expected, result )
+            it("returns a nil value", function()
+                local expected = nil
+                assert.are.same( expected, result )
+            end)
         end)
-        it("should copy a scalar string value", function()
+        describe( "when value is a scalar string", function()
             local input = "hello world"
             local result = deepcopy( input )
-            local expected = "hello world"
-            assert.are.same( expected, result ) -- same value
+            it("returns the string", function()
+                local expected = "hello world"
+                assert.are.same( expected, result ) -- same value
+            end)
         end)
-        it("should copy a simple table", function()
+        describe( "when value is a simple table", function()
             local input = { 1, 2, 3 }
             local result = deepcopy( input )
-            local expected = { 1, 2, 3 }
-            assert.are.same( expected, result ) -- same value
-            assert.are_not.equal( input, result ) -- different memory location
+            it("returns the same values", function()
+                local expected = { 1, 2, 3 }
+                assert.are.same( expected, result ) -- same values
+            end)
+            it("returns a different table", function()
+                assert.are_not_equal( input, result ) -- different memory location
+            end)
+        end)
+        describe( "when value is a complex table", function()
+            local input = { a = 3, b = "something", c = { c1 = 'foo', c2 = 'bar' } }
+            input[ 2 ] = 42  -- add a numeric index too
+            local result = deepcopy( input )
+            it("returns the same top-level values", function()
+                assert.are.same( 'something', result[ 'b' ] )
+                assert.are.same( 42, result[ 2 ] )
+            end)
+            it("returns the same nested values", function()
+                local expected = { c1 = 'foo', c2 = 'bar' }
+                assert.are.same( expected, result.c ) -- same values
+            end)
+            it("returns a different top-level table", function()
+                assert.are_not_equal( input, result ) -- different memory location
+            end)
+            it("returns a different nested table", function()
+                assert.are_not_equal( input.c, result.c ) -- different memory location
+            end)
         end)
     end)
 
     describe( "deepmerge()", function()
-        it("returns original target if not merging a table", function()
-            local input = 'notatable'
+        describe( "when overrides is nil", function()
+            local overrides = nil
             local target = { a = 'foo' }
-            local result = deepmerge( target, input )
-            local expected = { a = 'foo' }
-            assert.are.same( expected, result )
+            local result = deepmerge( target, overrides )
+            it("returns a different table", function()
+                assert.are.not_equal( target, result ) -- different memory location
+            end)
+            it("returns the unmodified values", function()
+                assert.are.equal( target.a, result.a )
+            end)
         end)
-        it("returns merged target with single-level merged values", function()
-            local input = { b = 'bar', c = 'baz' }
+        describe( "when overrides is a non-nil scalar", function()
+            local overrides = 'notatable'
             local target = { a = 'foo' }
-            local result = deepmerge( target, input )
-            local expected = { a = 'foo', b = 'bar', c = 'baz' }
-            assert.are.same( expected, result )
+            local result = deepmerge( target, overrides )
+            it("returns a different table", function()
+                assert.are.not_equal( target, result ) -- different memory location
+            end)
+            it("returns the unmodified values", function()
+                assert.are.equal( target.a, result.a )
+            end)
         end)
-        it("returns merged target with multiple-level merged values", function()
-            local input = { b = 'bar', c = { d = 'baz' } }
-            local target = { a = 'foo', c = { e = 'qux' } }
-            local result = deepmerge( target, input )
-            local expected = { a = 'foo', b = 'bar', c = { d = 'baz', e = 'qux' } }
-            assert.are.same( expected, result )
+        describe( "when overrides is an empty table", function()
+            local overrides = {}
+            local target = { a = 'foo' }
+            local result = deepmerge( target, overrides )
+            it("returns a different table", function()
+                assert.are.not_equal( target, result ) -- different memory location
+            end)
+            it("returns the unmodified values", function()
+                assert.are.equal( target.a, result.a )
+            end)
         end)
-        it("returns merged target with multiple-level overridden values", function()
-            local input = { b = 'bar', c = { d = 'baz', e = 'new' } }
+        describe( "when overrides is a simple table", function()
+            local overrides = { b = 'bar', c = 'baz' }
+            local target = { a = 'foo' }
+            local result = deepmerge( target, overrides )
+            it("returns a different table", function()
+                assert.are.not_equal( target, result ) -- different memory location
+            end)
+            it("returns merged values", function()
+                local expected = { a = 'foo', b = 'bar', c = 'baz' }
+                assert.are.same( expected, result )
+            end)
+        end)
+        describe( "when overrides has non-conflicting children", function()
+            local overrides = { b = 'bar', c = { d = 'baz' } }
             local target = { a = 'foo', c = { e = 'qux' } }
-            local result = deepmerge( target, input )
-            local expected = { a = 'foo', b = 'bar', c = { d = 'baz', e = 'new' } }
-            assert.are.same( expected, result )
+            local result = deepmerge( target, overrides )
+            it("returns merged values", function()
+                local expected = { a = 'foo', b = 'bar', c = { d = 'baz', e = 'qux' } }
+                assert.are.same( expected, result )
+            end)
+        end)
+        describe( "when overrides has conflicting children", function()
+            local overrides = { b = 'bar', c = { d = 'baz', e = 'new' } }
+            local target = { a = 'foo', c = { e = 'qux' } }
+            local result = deepmerge( target, overrides )
+            it("returns overridden values", function()
+                local expected = { a = 'foo', b = 'bar', c = { d = 'baz', e = 'new' } }
+                assert.are.same( expected, result )
+            end)
         end)
     end)
+
     describe( "table_keys()", function()
-        it( "returns an empty set on empty input", function()
+        describe( "when input is empty", function()
             local input = {}
-            local expected = {}
             local result = table_keys( input )
-            assert.are.same( expected, result )
+            it( "returns an empty list", function()
+                local expected = {}
+                assert.are.same( expected, result )
+            end)
         end)
-        it( "returns integer keys for basic list", function()
+        describe( "when input is a basic list", function()
             local input = { 'foo', 'bar', 'baz'}
-            local expected = { 1, 2, 3 }
             local result = table_keys( input )
-            assert.are.same( expected, result )
+            it( "returns integer keys", function()
+                local expected = { 1, 2, 3 }
+                assert.are.same( expected, result )
+            end)
         end)
-        it( "returns hash keys for hash", function()
+        describe( "when input is a pure hash", function()
             local input = { a = 'foo', c = 'bar', b = 'baz'}
-            local expected = { 'a', 'c', 'b' }
             local result = table_keys( input )
-            assert.are.same( expected, result )
+            it( "returns hash keys", function()
+                local expected = { 'a', 'c', 'b' }
+                assert.are.same( expected, result )
+            end)
+        end)
+        describe( "when input is a mixed list/hash", function()
+            local input = { a = 'foo', d = 'bar', b = 'baz'}
+            input[ 2 ] = 'qux'
+            input[ 4 ] = 'quux'
+            local result = table_keys( input )
+            it( "returns the expected number of keys", function()
+                assert.is.equal( 5, #result )
+            end)
+            it( "returns the expected keys", function()
+                -- sort to make the comparison easier.
+                table.sort( result, function( a, b ) return tostring( a ) < tostring( b ) end )
+                local expected = { 2, 4, 'a', 'b', 'd' }
+                assert.is_same( expected, result )
+            end)
         end)
     end)
 end)
