@@ -135,6 +135,7 @@ end
 -- note that the entity will not actually be deleted until reapEntities() 
 -- is called. 
 function EntityManager:deleteEntity( entity )
+    assert( entity, "can't delete nonexistant entity" )
     -- just flag the entity as deleted. 
     self.deleted_entities[ entity.id ] = entity
 end
@@ -330,8 +331,10 @@ end
 -- removeTagsFromEntity( entity, tags )
 --  remove multiple tags from an entity
 function EntityManager:removeTagsFromEntity( entity, tags )
-    for _, tag_name in ipairs( tags ) do
-        self:removeTagFromEntity( entity, tag_name )
+    if tags then
+        for _, tag_name in ipairs( tags ) do
+            self:removeTagFromEntity( entity, tag_name )
+        end
     end
 end
 
