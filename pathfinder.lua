@@ -34,7 +34,7 @@ function PathFinder:getKey( point )
 end
 
 function PathFinder:astarSearch( start, goal )
-    local frontier = PriorityQueue:new()
+    local frontier = PriorityQueue:new( function( a, b ) return a > b end )
     
     local came_from = {}
     local cost_so_far = {}
