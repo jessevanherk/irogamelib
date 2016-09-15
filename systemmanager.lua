@@ -16,7 +16,7 @@ function SystemManager:new( ... )
 end
 
 function SystemManager:_init( systems, system_prefix, space )
-    self.system_prefix = system_prefix or "lib.systems."
+    self.system_prefix = system_prefix or "systems."
 
     -- these are automatically populated based on whether the system has update() or draw() functions.
     self.update_systems = {}
