@@ -175,11 +175,11 @@ describe( "Utils", function()
             end)
         end)
         context( "when overrides has conflicting children", function()
-            local overrides = { b = 'bar', c = { d = 'baz', e = 'new' } }
-            local target = { a = 'foo', c = { e = 'qux' } }
+            local overrides = { b = 'bar', c = { d = 'baz', e = 'new' }, is_f = false }
+            local target = { a = 'foo', c = { e = 'qux' }, is_f = true }
             local result = deepmerge( target, overrides )
             it("gives overrides precedence", function()
-                local expected = { a = 'foo', b = 'bar', c = { d = 'baz', e = 'new' } }
+                local expected = { a = 'foo', b = 'bar', c = { d = 'baz', e = 'new' }, is_f = false }
                 assert.are.same( expected, result )
             end)
         end)

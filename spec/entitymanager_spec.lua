@@ -23,6 +23,7 @@ local component_templates = {
     animation = {
         sequence = 'idle',
         frame_id = 1,
+        is_loop = true,
         frames = {
             idle = { 'f01', 'f02' },
         },
@@ -48,7 +49,9 @@ local entity_templates = {
         identity = {},
         position = { x = 42 },
         hitbox = { shape = 'circle' },
-        animation = {},
+        animation = {
+            is_loop = false,
+        },
         complex = {
             nested = { 
                 tables = {
@@ -214,9 +217,14 @@ describe( "EntityManager", function()
                 assert.is_equal( 9, entity.complex.nested.tables.are.difficult.values[ 6 ] )
                 assert.is_equal( 'circle', entity.hitbox.shape )
             end)
-            it( "has values from the overrides", function()
+            it( "overrides strings", function()
                 assert.is_equal( 'Susan', entity.identity.first_name )
+            end)
+            it( "overrides numbers", function()
                 assert.is_equal( -4, entity.position.x )
+            end)
+            it( "overrides boolean values", function()
+                assert.is_equal( false, entity.animation.is_loop )
             end)
             it( "has the expected tags", function()
                 local tags = table_keys( entity.tags )

@@ -200,7 +200,7 @@ function EntityManager:addComponentToEntity( entity, component_name, overrides )
         entity[ component_name ] = deepmerge( self.component_templates[ component_name ], overrides )
     else
         -- this is only an informative message.
-        plog( "unknown component '" .. component_name .. "'. Check for typos?" )
+        print( "addComponentToEntity: unknown component '" .. component_name .. "'. Check for typos?" )
     end
 
     -- add this entity to the index so we can quickly find it

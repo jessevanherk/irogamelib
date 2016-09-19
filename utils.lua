@@ -62,13 +62,13 @@ function deepmerge( base, overrides )
     -- go through each key. copy base if any, then override if any.
     for key, _ in pairs( keys ) do
         -- if there is no override
-        if base[ key ] and overrides[ key ] then -- merge them.
+        if base[ key ] ~= nil and overrides[ key ] ~= nil then -- merge them.
             if type( overrides[ key ] ) == 'table' then
                 target[ key ] = deepmerge( base[ key ], overrides[ key ] )
             else
                 target[ key ] = overrides[ key ]
             end
-        elseif base[ key ] then -- just the base.
+        elseif base[ key ] ~= nil then -- just the base.
             target[ key ] = deepcopy( base[ key ] )
         else -- just the override
             target[ key ] = deepcopy( overrides[ key ] )
