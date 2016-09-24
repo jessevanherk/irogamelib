@@ -395,4 +395,25 @@ function EntityManager:getEntityWithTag( tag_name )
     return entity
 end
 
+-- output the given entity as tables, suitable for use as overrides.
+-- returns two tables - one of components, one of tags.
+function EntityManager:getEntityData( entity )
+    local data_tags = {}
+    local data_components = {}
+
+    if entity then
+        -- FIXME: test for references, keep them from breaking
+        for component_name, _ in pairs( entity.components ) do
+            data_components[ component_name ] = deepcopy( entity[ component_name ] )
+        end
+
+        -- return tags as a flat list.
+        for tag_name, _ in pairs( entity.tags ) do
+            data_tags[ #data_tags + 1 ] = tag_name
+        end
+    end
+
+    return data_components, data_tags
+end
+
 return EntityManager
