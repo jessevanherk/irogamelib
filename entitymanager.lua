@@ -416,4 +416,14 @@ function EntityManager:getEntityData( entity )
     return data_components, data_tags
 end
 
+function EntityManager:getAllEntitiesData()
+    local results = {}
+    for id, entity in pairs( self.entities ) do
+        local data_components, data_tags = self:getEntityData( entity )
+        results[ #results + 1 ] = { id, data_components, data_tags }
+    end
+
+    return results
+end
+
 return EntityManager
