@@ -107,12 +107,12 @@ end
 
 -- get the value of the nth item without modifying anything
 function List:get( n )
-    if n <= 0 or n >= self:length() do
+    local first = self.first
+    if first > self.last then
         return nil
     end
 
-    local first = self.first
-    if first > self.last then
+    if n <= 0 or n > self:length() then
         return nil
     end
 
