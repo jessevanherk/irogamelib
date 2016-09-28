@@ -2,7 +2,7 @@ local serializer = {}
 
 function serializer.getAsFile( input, table_name )
     local serialized = serializer.getstring( input )
-    local contents = "local " .. table_name .. " = " .. serialized .. "\r\nreturn " .. table_name .. "\r\n"
+    local contents = "local " .. table_name .. " = " .. serialized .. "\nreturn " .. table_name .. "\n"
     return contents
 end
 
@@ -31,11 +31,11 @@ function serializer.getstring(object, multiline, depth, name)
             or tostring(name)) .. ' = '
     end
     if type(object) == 'table' then
-        r = r .. '{' .. (multiline and '\r\n' or ' ')
+        r = r .. '{' .. (multiline and '\n' or ' ')
         local length = 0
         for i, v in ipairs(object) do
             r = r .. serializer.getstring(v, multiline, multiline and (depth + 1) or 0) .. ','
-                .. (multiline and '\r\n' or ' ')
+                .. (multiline and '\n' or ' ')
             length = i
         end
         for i, v in pairs(object) do
@@ -49,7 +49,7 @@ function serializer.getstring(object, multiline, depth, name)
                 or ((itype == 2) and (string.sub(i, 1, 1) == '_')) -- prefixed string
             if not skip then
                 r = r .. serializer.getstring(v, multiline, multiline and (depth + 1) or 0, i) .. ','
-                    .. (multiline and '\r\n' or ' ')
+                    .. (multiline and '\n' or ' ')
             end
         end
         r = r .. (multiline and padding or '') .. '}'
