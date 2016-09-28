@@ -105,6 +105,20 @@ function List:peekFirst()
     return self[ first ]
 end
 
+-- get the value of the nth item without modifying anything
+function List:get( n )
+    if n <= 0 or n >= self:length() do
+        return nil
+    end
+
+    local first = self.first
+    if first > self.last then
+        return nil
+    end
+
+    return self[ first + n - 1 ]
+end
+
 -- get the value of the last item without modifying anything
 function List:peekLast()
     local last = self.last
