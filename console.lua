@@ -17,10 +17,10 @@ end
 
 -- context is a table of variables we want to operate on.
 -- they get copied in to the top level for evaluating.
-function Console.eval( expression, context )
+function Console.eval( expression )
     local output = ""
 
-    -- evaluate it (or try to)
+    -- try to parse/compile it into lua code
     -- catch errors!
     local func, err_str = loadstring( expression )
 
@@ -40,20 +40,7 @@ function Console.eval( expression, context )
 
     -- It compiled. Try evaluating it.
     if func then
-        -- make sure function is executed in a safe environment
-        -- so it can't clobber the global environment, purposely or accidentally.
-        -- pre-load it with a copy of the standard globals.
-        local new_env = {}        -- create new environment
-        setmetatable( new_env, { __index = _G } )
-        setfenv( func, new_env )
-
-        -- make sure our context data is available
-        if context then
-            for key, value in pairs( context ) do
-                new_env[ key ] = value
-            end
-        end
-
+        -- we're in the CONSOLE, so we want to access the global environment.
         local results = { pcall( func ) }
 
         local success = results[ 1 ]  -- grab the first item, which is the success code
