@@ -572,7 +572,8 @@ describe( "EntityManager", function()
         context( "when one entity present", function()
             local entity = EM:createEntity( 'rock', nil, { 'rocky', 'heroic' } )
             local results = EM:getAllEntitiesData()
-            local id, components, tags = unpack( results[ 1 ] )
+            local result = results[ 1 ]
+            local id, components, tags = result.id, result.components, result.tags
             table.sort( tags )
             it( "has the expected components", function()
                 local expected = {

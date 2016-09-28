@@ -420,7 +420,12 @@ function EntityManager:getAllEntitiesData()
     local results = {}
     for id, entity in pairs( self.entities ) do
         local data_components, data_tags = self:getEntityData( entity )
-        results[ #results + 1 ] = { id, data_components, data_tags }
+        local entity_data = {
+            id = id,
+            components = data_components,
+            tags = data_tags,
+        }
+        results[ #results + 1 ] = entity_data
     end
 
     return results
