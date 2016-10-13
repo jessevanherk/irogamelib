@@ -26,19 +26,44 @@ function rgba( colour )
 end
 
 -- perform a full deep copy on the given table
-function deepcopy( t )
-    if type( t ) ~= 'table' then 
-        return t 
+local deepcopy_visited = {} -- static 
+function deepcopy( t, depth )
+    if not depth then
+        deepcopy_visited = {}  -- reset our visited list.
+        depth = 1 -- set starting depth
     end
-    local mt = getmetatable( t )
-    local result = {}
-    for k,v in pairs( t ) do
-        if type( v ) == 'table' then
-            v = deepcopy( v ) -- copy recursively
+
+    local result = t -- default works if it's a scalar
+
+    if type( t ) == 'table' then 
+        -- have we already visited it? If so, return a reference.
+        local key = tostring( t )
+        if deepcopy_visited[ key ] then
+            -- it's already been copied - return it.
+            return deepcopy_visited[ key ]
         end
-        result[ k ] = v
+
+        -- create a new table for it.
+        result = {}
+
+        -- record the reference right away to avoid cycles
+        deepcopy_visited[ key ] = result
+
+        -- make a copy of the table, key by key.
+        for k,v in pairs( t ) do
+            if type( v ) == 'table' then
+                v = deepcopy( v, depth + 1 ) -- copy recursively
+            end
+            result[ k ] = v
+        end
+
+        local mt = getmetatable( t )
+        setmetatable( result, mt )
+
+        -- stash this table, record as visited to avoid cycles.
+        deepcopy_visited[ tostring( t ) ] = result
     end
-    setmetatable( result, mt )
+
     return result
 end
 

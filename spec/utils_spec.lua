@@ -117,6 +117,30 @@ describe( "Utils", function()
                 assert.are_not_equal( input.c, result.c ) -- different memory location
             end)
         end)
+        context( "when table has a circular reference", function()
+            local parent = { a = 2, b = 3 }
+            local child = { c = 5, d = 7, dad = parent }
+            parent.kid = child
+
+            local expected = { a = 2, b = 3 }
+            local expected_child = { c = 5, d = 7, dad = expected }
+            expected.kid = expected_child
+
+            local result = deepcopy( parent )
+
+            it("doesn't throw an error", function()
+                assert.has_no_errors( function() deepcopy( parent ) end )
+            end)
+            it("returns the expected values", function()
+                assert.are.same( expected, result ) -- same values
+            end)
+            it("returns a different table", function()
+                assert.are_not_equal( parent, result ) -- different memory location
+            end)
+            it("returns a different nested table", function()
+                assert.are_not_equal( parent.kid, result.kid ) -- different memory location
+            end)
+        end)
     end)
 
     describe( "deepmerge()", function()
