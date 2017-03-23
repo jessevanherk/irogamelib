@@ -1,7 +1,7 @@
 --------------------------------
 -- Space: encapsulates a collection of entities, systems, and timers.
 --        similar to what artemis framework uses.
---        This is useful for having multiple loaded levels/scenes and only having one active, 
+--        This is useful for having multiple loaded levels/scenes and only having one active,
 --        e.g. gameplay versus menus
 
 local Space = {}
@@ -21,7 +21,9 @@ function Space:_init( entity_templates, component_templates, systems, system_pre
     self.signal = Signal.new()
     self.timer  = Timer.new()
 
-    self.entity_manager = EntityManager:new( entity_templates, component_templates, self.onCreatedEntity )
+    self.entity_manager = EntityManager:new( entity_templates,
+                                             component_templates,
+                                             self.onCreatedEntity )
     self.system_manager = SystemManager:new( systems, system_prefix, self )
 end
 
@@ -29,7 +31,7 @@ end
 function Space:update( dt )
     -- update timers.
     self.timer:update( dt )
-    
+
     self.entity_manager:update( dt )
     self.system_manager:update( dt )
 end

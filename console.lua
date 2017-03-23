@@ -52,7 +52,7 @@ function Console.eval( expression )
             end
             output = table.concat( escaped, ", " )
         else
-            local err_str = results[ 2 ]
+            err_str = results[ 2 ]
             output = '! Evaluation error: ' .. err_str
         end
     end

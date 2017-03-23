@@ -18,7 +18,7 @@ end
 function SystemManager:_init( systems, system_prefix, space )
     self.system_prefix = system_prefix or "systems."
 
-    -- these are automatically populated based on whether the system has update() or draw() functions.
+    -- automatically populated lists, based on existence of update() or draw() functions.
     self.update_systems = {}
     self.draw_systems = {}
     self.systems = {}

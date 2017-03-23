@@ -18,8 +18,8 @@ local function hook( event )
         level = level + 1
     else
         level = level - 1
-        if level < 0 then 
-            level = 0 
+        if level < 0 then
+            level = 0
         end
     end
     if t.what == "main" then

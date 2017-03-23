@@ -38,7 +38,6 @@ function PoissonDisk:new( ... )
     return instance
 end
 
--- want to 
 function PoissonDisk:_init( width, height, min_distance )
     self.width = width
     self.height = height
@@ -73,8 +72,8 @@ function PoissonDisk:getNearbyCells( grid_point )
     local cells = {}
 
     local radius = 2 -- two to the left plus center plus two to the right = 5
-    local x = grid_point[ 1 ] 
-    local y = grid_point[ 2 ] 
+    local x = grid_point[ 1 ]
+    local y = grid_point[ 2 ]
 
     local min_i = 1
     local min_j = 1
@@ -123,7 +122,7 @@ Two parameters determine the new point’s position:
 the angle (randomly chosen between 0 and 360 degrees), and the distance from
 the original point (randomly chosen between the minimum distance and twice
 the minimum distance).
-]]-- 
+]]--
 
 function PoissonDisk:generateNearbyPoint( point )
     --random angle
@@ -244,7 +243,7 @@ end
 function PoissonDisk:getSampleSets( sources )
     local sample_sets = {}
 
-    for source_id, source in ipairs( sources ) do
+    for _, source in ipairs( sources ) do
         local set_points = self:getBalancedSamples( source )
 
         table.insert( sample_sets, set_points )

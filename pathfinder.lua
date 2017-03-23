@@ -35,7 +35,7 @@ end
 
 function PathFinder:astarSearch( start, goal )
     local frontier = PriorityQueue:new( function( a, b ) return a > b end )
-    
+
     local came_from = {}
     local cost_so_far = {}
 
@@ -89,7 +89,7 @@ function PathFinder:reconstructPath( came_from, goal )
     -- reverse that path so it goes from start to end.
     local path = {}
     for i, node in ipairs( back_path ) do
-        path[ #back_path - i + 1 ] = back_path[ i ]
+        path[ #back_path - i + 1 ] = node
     end
 
     return path

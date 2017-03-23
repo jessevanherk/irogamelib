@@ -27,7 +27,7 @@ function I18n.setLocale( locale )
     end
 end
 
--- main translation function. 
+-- main translation function.
 -- this should be used ANY time you are OUTPUTTING a string. See dstr for data files though.
 -- params is a list of variables to sub in.
 -- the string template should look like:
@@ -46,7 +46,7 @@ function I18n.str( string, params )
     return translation
 end
 
--- dummy translation function. 
+-- dummy translation function.
 -- basically just makes it easy to find strings that need translating later.
 -- this should mainly just be used in data files.
 function I18n.dstr( string )

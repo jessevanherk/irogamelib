@@ -68,7 +68,7 @@ function EntityManager:createEntity( template_name, component_overrides, tags )
         local entity_template = self.entity_templates[ template_name ]
 
         for component_name, template_overrides in pairs( entity_template ) do
-            -- first, copy the component defaults onto our new entity 
+            -- first, copy the component defaults onto our new entity
             -- then use template overrides right away
             self:addComponentToEntity( entity, component_name, template_overrides )
         end
@@ -112,7 +112,7 @@ function EntityManager:updateEntityComponent( entity, component_name, overrides 
 
     -- keep it simple.
     for key, override in pairs( overrides ) do
-        if ( type( override ) ~= 'table' ) then 
+        if ( type( override ) ~= 'table' ) then
             -- easy, just copy it over directly.
             entity[ component_name ][ key ] = override
         else -- it's a sub-table.
@@ -132,11 +132,11 @@ end
 
 -- deleteEntity( entity )
 -- mark an existing entity for deletion. okay to call from systems/callbacks.
--- note that the entity will not actually be deleted until reapEntities() 
--- is called. 
+-- note that the entity will not actually be deleted until reapEntities()
+-- is called.
 function EntityManager:deleteEntity( entity )
     assert( entity, "can't delete nonexistant entity" )
-    -- just flag the entity as deleted. 
+    -- just flag the entity as deleted.
     self.deleted_entities[ entity.id ] = entity
 end
 
@@ -196,8 +196,10 @@ function EntityManager:addComponentToEntity( entity, component_name, overrides )
 
     if self.component_templates[ component_name ] ~= nil then
         -- deep-copy the component template onto the entity
-        -- override with any values that were passed in. these may be coming from the entity template.
-        entity[ component_name ] = deepmerge( self.component_templates[ component_name ], overrides )
+        -- override with any values that were passed in.
+        -- these may be coming from the entity template.
+        local component_template = self.component_templates[ component_name ]
+        entity[ component_name ] = deepmerge( component_template, overrides )
     else
         -- this is only an informative message.
         print( "addComponentToEntity: unknown component '" .. component_name .. "'. Check for typos?" )
@@ -363,7 +365,7 @@ function EntityManager:getEntitiesWithTag( tag_name )
         for id, entity in pairs( self.tagged_entities[ tag_name ]  ) do
             matching_entities[ #matching_entities + 1 ] = entity
         end
-    end 
+    end
 
     return matching_entities
 end
@@ -390,7 +392,7 @@ function EntityManager:getEntityWithTag( tag_name )
     if tagged_entities and #tagged_entities > 0 then
         -- take the first one in the list.
         entity = tagged_entities[ 1 ]
-    end 
+    end
 
     return entity
 end

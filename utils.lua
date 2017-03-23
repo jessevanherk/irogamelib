@@ -1,4 +1,4 @@
--- general utilities 
+-- general utilities
 
 -- convert a single int number into an RGB triplet
 -- for sanity, pass in as a hex number, eg. rgb( 0xc1c1c1 )
@@ -26,7 +26,7 @@ function rgba( colour )
 end
 
 -- perform a full deep copy on the given table
-local deepcopy_visited = {} -- static 
+local deepcopy_visited = {} -- static
 function deepcopy( t, depth )
     if not depth then
         deepcopy_visited = {}  -- reset our visited list.
@@ -35,7 +35,7 @@ function deepcopy( t, depth )
 
     local result = t -- default works if it's a scalar
 
-    if type( t ) == 'table' then 
+    if type( t ) == 'table' then
         -- have we already visited it? If so, return a reference.
         local key = tostring( t )
         if deepcopy_visited[ key ] then
@@ -131,7 +131,7 @@ function spairs( t, order_cb )
     for k in pairs( t ) do keys[ #keys + 1 ] = k end
 
     -- if order function given, sort by it by passing the table and keys a, b,
-    -- otherwise just sort the keys 
+    -- otherwise just sort the keys
     if order then
         table.sort( keys, function( a, b ) return order_cb( t, a, b ) end )
     else
@@ -147,8 +147,6 @@ function spairs( t, order_cb )
         end
     end
 end
-
-
 
 function table_keys( t )
     local keys = {}

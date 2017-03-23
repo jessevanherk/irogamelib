@@ -1,4 +1,4 @@
--- basic implementation of a list that can be used as a list or a stack. 
+-- basic implementation of a list that can be used as a list or a stack.
 -- Original version:
 -- http://www.lua.org/pil/11.4.html
 -- insert or remove an element at both ends in constant time
@@ -10,16 +10,16 @@ local Q = List:new()
 Q.push( foo )
 Q.push( bar )
 local next_item = Q.shift()  -- gets foo
-    
+
 #STACK
 
 local Q = List:new()
 Q.push( foo )
 Q.push( bar )
 local next_item = Q.pop() -- gets bar
-    
+
 ]]
-    
+
 local List = {}
 
 function List:new( ... )
@@ -71,7 +71,7 @@ end
 
 function List:pop()
     local last = self.last
-    if self.first > last then 
+    if self.first > last then
         return nil
     end
 
@@ -122,7 +122,7 @@ end
 -- get the value of the last item without modifying anything
 function List:peekLast()
     local last = self.last
-    if self.first > last then 
+    if self.first > last then
         return nil
     end
 

@@ -3,7 +3,8 @@ Usage:
   new( comparator ):
       comparator (optional): Use this function to compare values.
             Default sorts numerically, putting HIGHEST numbers at the start of the queue.
-            Comparator takes two values and returns true if the first should be further up, false otherwise
+            Comparator takes two values and returns true if the first should be further up,
+            false otherwise
   new( comparator, values, priorities ):
       comparator: same as above. nil to use default comparator.
       values: Table to use as the values
@@ -11,7 +12,8 @@ Usage:
   clone(): Create and return a copy of the PriorityQueue
   push( value, priority ): push a new item onto the PriorityQueue
   pop():   Get and remove the highest priority value from the queue
-  peek():  Get the highest priority value from the queue but don't remove it. returns nil if queue is empty
+  peek():  Get the highest priority value from the queue but don't remove it.
+           returns nil if queue is empty
   clear(): clear the PriorityQueue
   print( show_priorities ): prints out all the elements in the PriorityQueue
       show_priorities: If true, also print the priorities
@@ -43,7 +45,7 @@ function PriorityQueue:_init( comparator, values, priorities )
         assert( type( comparator ) == 'function', "comparator must be a function" )
         self.compare = comparator
     end
-    
+
     self.values = {}
     self.priorities = {}
 
@@ -177,19 +179,15 @@ end
 
 -- NOTE that this does not do sorting - this prints them in memory order!!
 function PriorityQueue:print( show_priorities )
-    if show_priorities then
-        local output = ""
-        for i = 1, #self.values do
-            output = output .. tostring(self.values[i]) .. "(" .. tostring(self.priorities[i]) .. ")\n"
+    local output = ""
+    for i = 1, #self.values do
+        local line = tostring(self.values[i])
+        if show_priorities then
+            line = line .. "(" .. tostring(self.priorities[i]) .. ")"
         end
-        print(output)
-    else
-        local output = ""
-        for i = 1, #self.values do
-            output = output .. tostring(self.values[i]) .. "\n"
-        end
-        print(output)
+        output = output .. line .. "\n"
     end
+    print(output)
 end
 
 function PriorityQueue:size()
