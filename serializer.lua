@@ -17,6 +17,10 @@ end
 -- and boolean values.
 -- local: fixed to also escape 'return' key . jvh, 20140726.
 function serializer.getstring(object, multiline, depth, name)
+  if depth and depth > 32 then
+    return "object too deep"
+  end
+
   depth = depth or 0
   if multiline == nil then multiline = true end
   local padding = string.rep('    ', depth) -- can use '\t' if printing to file
