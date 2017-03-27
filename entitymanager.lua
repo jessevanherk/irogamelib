@@ -418,9 +418,9 @@ function EntityManager:getEntityData( entity )
   return data_components, data_tags
 end
 
-function EntityManager:getAllEntitiesData()
+function EntityManager:getEntitiesData( entities )
   local results = {}
-  for id, entity in pairs( self.entities ) do
+  for id, entity in pairs( entities ) do
     local data_components, data_tags = self:getEntityData( entity )
     local entity_data = {
       id = id,
@@ -429,6 +429,20 @@ function EntityManager:getAllEntitiesData()
     }
     results[ #results + 1 ] = entity_data
   end
+
+  return results
+end
+
+function EntityManager:getAllEntitiesData()
+  local entities = self.entities
+  local results = self:getEntitiesData( entities )
+
+  return results
+end
+
+function EntityManager:getTaggedEntitiesData( tag )
+  local entities = self.getEntitiesWithTag( tag )
+  local results = self:getEntitiesData( entities )
 
   return results
 end
