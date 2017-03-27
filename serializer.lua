@@ -18,7 +18,7 @@ end
 -- local: fixed to also escape 'return' key . jvh, 20140726.
 function serializer.getstring(object, multiline, depth, name)
   if depth and depth > 32 then
-    return "object too deep"
+    return "-- object too deep"
   end
 
   depth = depth or 0
