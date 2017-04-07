@@ -23,7 +23,7 @@ function serializer.getstring(object, multiline, depth, name)
 
   depth = depth or 0
   if multiline == nil then multiline = true end
-  local padding = string.rep('    ', depth) -- can use '\t' if printing to file
+  local padding = string.rep('  ', depth) -- can use '\t' if printing to file
   local r = padding -- result string
   if name then -- should start from name
     r = r .. (
@@ -64,6 +64,8 @@ function serializer.getstring(object, multiline, depth, name)
     r = r .. string.format('%q', object)
   elseif type(object) == 'number' or type(object) == 'boolean' then
     r = r .. tostring(object)
+  elseif object == nil then
+    r = nil
   else
     error('Cannot serialize value "' .. tostring(object) .. '"')
   end
