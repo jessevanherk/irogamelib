@@ -1,6 +1,8 @@
-local serializer = require( 'serializer' )
+local Serializer = require( 'serializer' )
 
-describe( "Serializer", function()
+describe( "serializer", function()
+  serializer = Serializer:new()
+
   describe( "getAsFile", function()
     context( "when input is empty", function()
       local input = {}
@@ -8,7 +10,7 @@ describe( "Serializer", function()
       it( "returns an empty table", function()
         local expected = "local foo = {\n}\nreturn foo\n"
 
-        assert.is.same( expected, serializer.getAsFile( input, "foo" ) )
+        assert.is.same( expected, serializer:getAsFile( input, "foo" ) )
       end)
     end)
 
@@ -20,7 +22,7 @@ describe( "Serializer", function()
       it( "returns the table", function()
         local expected = "local foo = {\n  x = {\n    y = 3,\n  },\n}\nreturn foo\n"
 
-        assert.is.same( expected, serializer.getAsFile( input, "foo" ) )
+        assert.is.same( expected, serializer:getAsFile( input, "foo" ) )
       end)
     end)
   end)
@@ -32,7 +34,7 @@ describe( "Serializer", function()
       it( "returns an empty table", function()
         local expected = nil
 
-        local result = serializer.getstring( input )
+        local result = serializer:getstring( input )
         assert.is.same( expected, result )
       end)
     end)
@@ -43,7 +45,7 @@ describe( "Serializer", function()
       it( "returns an empty table", function()
         local expected = "{\n}"
 
-        local result = serializer.getstring( input )
+        local result = serializer:getstring( input )
         assert.is.same( expected, result )
       end)
     end)
@@ -58,21 +60,20 @@ describe( "Serializer", function()
         local expected = '{\n  y = {\n    3,\n    1,\n    4,\n    1,\n    syn = "ack",\n  },\
   x = {\n    y = 3,\n    z = false,\n  },\n}'
 
-        assert.is.same( expected, serializer.getstring( input ) )
+        assert.is.same( expected, serializer:getstring( input ) )
       end)
     end)
 
-    context( "when name is specified", function()
+    context( "when serializing twice", function()
       local input = {
         x = { y = 3, z = false },
-        y = { 3, 1, 4, 1, syn = "ack" },
       }
 
-      it( "returns the table", function()
-        local expected = 'foo = {\n  y = {\n    3,\n    1,\n    4,\n    1,\n    syn = "ack",\n  },\
-  x = {\n    y = 3,\n    z = false,\n  },\n}'
+      it( "resets properly between runs", function()
+        local expected = '{\n  x = {\n    y = 3,\n    z = false,\n  },\n}'
 
-        assert.is.same( expected, serializer.getstring( input, true, 0, "foo" ) )
+        serializer:getstring( input )
+        assert.is.same( expected, serializer:getstring( input ) )
       end)
     end)
 
@@ -88,7 +89,7 @@ describe( "Serializer", function()
       it( "returns the table without recursion", function()
         local expected = "{\n  ref_to_b = {\n    y = 3,\n  },\n}"
 
-        assert.is.same( expected, serializer.getstring( a ) )
+        assert.is.same( expected, serializer:getstring( a ) )
       end)
     end)
   end)

@@ -1,7 +1,20 @@
-local serializer = {}
+local Serializer = {}
 
-function serializer.getAsFile( input, table_name )
-  local serialized = serializer.getstring( input )
+-- magic constructor for the system. real init code goes in init().
+function Serializer:new( ... )
+  local instance = {}
+  setmetatable( instance, self )
+  self.__index = self
+  self._init( instance, ... )
+  return instance
+end
+
+function Serializer:_init()
+  self:clearSeenKeys()
+end
+
+function Serializer:getAsFile( input, table_name )
+  local serialized = self:getstring( input )
 
   local contents = "local " .. table_name .. " = " .. serialized .. "\n"
   contents = contents .. "return " .. table_name .. "\n"
@@ -9,32 +22,36 @@ function serializer.getAsFile( input, table_name )
   return contents
 end
 
--- getstring ~ by YellowAfterlife. http://yal.cc/lua-serializer/
--- Converts value back into string according to Lua presentation
--- Accepts strings, numbers, boolean values, and tables.
--- Table values are serialized recursively, so tables linking to themselves or
--- linking to other tables in "circles". Table indexes can be numbers, strings,
--- and boolean values.
--- local: fixed to also escape 'return' key . jvh, 20140726.
-function serializer.getstring(object, multiline, depth, name)
+function Serializer:getstring( object, depth, name )
+  self:clearSeenKeys()
+  return self:serialize( object, depth, name )
+end
+
+function Serializer:serialize(object, depth, name)
   if depth and depth > 4 then
     return "-- object too deep"
   end
 
   depth = depth or 0
-  multiline = multiline or true
 
   local r = string.rep('  ', depth)
   if name then -- should start from name
-    r = r .. serializer.serializeName( name )
+    r = r .. self:serializeName( name )
   end
 
   if type(object) == 'table' then
-    r = r .. serializer.serializeTable( object, multiline, depth )
+    local key = self:getKey( object )
+    if self:alreadySeen( key ) then
+      r = r .. "nil -- already saw table " .. key
+    else
+      self:recordKey( key )
+
+      r = r .. self:serializeTable( object, depth )
+    end
   elseif type(object) == 'string' then
-    r = r .. serializer.serializeString( object )
+    r = r .. self:serializeString( object )
   elseif type(object) == 'number' or type(object) == 'boolean' then
-    r = r .. serializer.serializeNumber( object )
+    r = r .. self:serializeNumber( object )
   elseif object == nil then
     r = nil
   else
@@ -43,7 +60,7 @@ function serializer.getstring(object, multiline, depth, name)
   return r
 end
 
-function serializer.serializeName( name )
+function Serializer:serializeName( name )
   r = (
   -- enclose in brackets if not string or not a valid identifier
   -- thanks to Boolsheet from #love@irc.oftc.net for string pattern
@@ -58,57 +75,53 @@ function serializer.serializeName( name )
   return r
 end
 
-function serializer.serializeTable( object, multiline, depth )
+function Serializer:serializeTable( object, depth )
   local padding = string.rep('  ', depth)
 
-  r = '{' .. serializer.sep( multiline )
+  r = '{' .. self:sep()
   local length = 0
 
   for i, v in ipairs(object) do
-    r = r .. serializer.getstring(v, multiline, serializer.next_depth( multiline, depth ) ) .. ','
-        .. serializer.sep( multiline )
+    r = r .. self:getstring(v, self:next_depth( depth ) ) .. ','
+        .. self:sep()
     length = i
   end
 
   for i, v in pairs(object) do
     -- convert type into something easier to compare:
-    itype = serializer.indextype( i )
+    itype = self:indextype( i )
 
     -- detect if item should be skipped
-    local skip = serializer.is_skippable( itype, i, length )
+    local skip = self:is_skippable( itype, i, length )
 
     if not skip then
-      r = r .. serializer.getstring(v, multiline, serializer.next_depth( multiline, depth ), i)
-          .. ',' .. serializer.sep( multiline )
+      r = r .. self:getstring(v, self:next_depth( depth ), i)
+          .. ',' .. self:sep()
     end
   end
-  r = r .. (multiline and padding or '') .. '}'
+  r = r .. padding .. '}'
 
   return r
 end
 
-function serializer.serializeString( object )
+function Serializer:serializeString( object )
   return string.format('%q', object)
 end
 
-function serializer.serializeNumber( object )
+function Serializer:serializeNumber( object )
   return tostring( object )
 end
 
-function serializer.next_depth( multiline, depth )
-  local next_depth = 0
-  if multiline then
-    next_depth = depth + 1
-  end
-
+function Serializer:next_depth( depth )
+  local next_depth = depth + 1
   return next_depth
 end
 
-function serializer.sep( multiline )
-  return multiline and '\n' or ' '
+function Serializer:sep()
+  return '\n'
 end
 
-function serializer.is_skippable( itype, i, length )
+function Serializer:is_skippable( itype, i, length )
   local is_skippable =
     ((itype == 1) and ((i % 1) == 0) and (i >= 1) and (i <= length)) -- ipairs part
     or ((itype == 2) and (string.sub(i, 1, 1) == '_')) -- prefixed string
@@ -116,7 +129,7 @@ function serializer.is_skippable( itype, i, length )
   return is_skippable
 end
 
-function serializer.indextype( i )
+function Serializer:indextype( i )
   itype = type( i )
   if itype == "number" then
     return 1
@@ -129,4 +142,24 @@ function serializer.indextype( i )
   end
 end
 
-return serializer
+function Serializer:getKey( object )
+  return tostring( object )
+end
+
+function Serializer:alreadySeen( key )
+  if self._seen_keys[ key ] then
+    return true
+  else
+    return false
+  end
+end
+
+function Serializer:recordKey( key )
+  self._seen_keys[ key ] = true
+end
+
+function Serializer:clearSeenKeys()
+  self._seen_keys = {}
+end
+
+return Serializer
