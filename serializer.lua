@@ -82,7 +82,7 @@ function Serializer:serializeTable( object, depth )
   local length = 0
 
   for i, v in ipairs(object) do
-    r = r .. self:getstring(v, self:next_depth( depth ) ) .. ','
+    r = r .. self:serialize(v, self:next_depth( depth ) ) .. ','
         .. self:sep()
     length = i
   end
@@ -95,7 +95,7 @@ function Serializer:serializeTable( object, depth )
     local skip = self:is_skippable( itype, i, length )
 
     if not skip then
-      r = r .. self:getstring(v, self:next_depth( depth ), i)
+      r = r .. self:serialize(v, self:next_depth( depth ), i)
           .. ',' .. self:sep()
     end
   end
