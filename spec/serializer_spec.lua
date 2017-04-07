@@ -62,6 +62,20 @@ describe( "Serializer", function()
       end)
     end)
 
+    context( "when name is specified", function()
+      local input = {
+        x = { y = 3, z = false },
+        y = { 3, 1, 4, 1, syn = "ack" },
+      }
+
+      it( "returns the table", function()
+        local expected = 'foo = {\n  y = {\n    3,\n    1,\n    4,\n    1,\n    syn = "ack",\n  },\
+  x = {\n    y = 3,\n    z = false,\n  },\n}'
+
+        assert.is.same( expected, serializer.getstring( input, true, 0, "foo" ) )
+      end)
+    end)
+
     context( "when input has a circular reference", function()
       local a = {
         ref_to_b = nil,

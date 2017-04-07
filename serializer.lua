@@ -24,54 +24,75 @@ function serializer.getstring(object, multiline, depth, name)
   depth = depth or 0
   multiline = multiline or true
 
-  local padding = string.rep('  ', depth)
-  local r = padding -- result string
+  local r = string.rep('  ', depth)
   if name then -- should start from name
-    r = r .. (
-    -- enclose in brackets if not string or not a valid identifier
-    -- thanks to Boolsheet from #love@irc.oftc.net for string pattern
-    (type(name) ~= 'string' or name:find('^([%a_][%w_]*)$') == nil or name == 'return')
-    and ('[' .. (
-    (type(name) == 'string')
-    and string.format('%q', name)
-    or tostring(name))
-    .. ']')
-    or tostring(name)) .. ' = '
+    r = r .. serializer.serializeName( name )
   end
 
   if type(object) == 'table' then
-    r = r .. '{' .. serializer.sep( multiline )
-    local length = 0
-
-    for i, v in ipairs(object) do
-      r = r .. serializer.getstring(v, multiline, serializer.next_depth( multiline, depth ) ) .. ','
-      .. serializer.sep( multiline )
-      length = i
-    end
-
-    for i, v in pairs(object) do
-      -- convert type into something easier to compare:
-      itype = serializer.indextype( i )
-
-      -- detect if item should be skipped
-      local skip = serializer.is_skippable( itype, i, length )
-
-      if not skip then
-        r = r .. serializer.getstring(v, multiline, serializer.next_depth( multiline, depth ), i)
-        .. ',' .. serializer.sep( multiline )
-      end
-    end
-    r = r .. (multiline and padding or '') .. '}'
+    r = r .. serializer.serializeTable( object, multiline, depth )
   elseif type(object) == 'string' then
-    r = r .. string.format('%q', object)
+    r = r .. serializer.serializeString( object )
   elseif type(object) == 'number' or type(object) == 'boolean' then
-    r = r .. tostring(object)
+    r = r .. serializer.serializeNumber( object )
   elseif object == nil then
     r = nil
   else
     error('Cannot serialize value "' .. tostring(object) .. '"')
   end
   return r
+end
+
+function serializer.serializeName( name )
+  r = (
+  -- enclose in brackets if not string or not a valid identifier
+  -- thanks to Boolsheet from #love@irc.oftc.net for string pattern
+  (type(name) ~= 'string' or name:find('^([%a_][%w_]*)$') == nil or name == 'return')
+  and ('[' .. (
+  (type(name) == 'string')
+  and string.format('%q', name)
+  or tostring(name))
+  .. ']')
+  or tostring(name)) .. ' = '
+
+  return r
+end
+
+function serializer.serializeTable( object, multiline, depth )
+  local padding = string.rep('  ', depth)
+
+  r = '{' .. serializer.sep( multiline )
+  local length = 0
+
+  for i, v in ipairs(object) do
+    r = r .. serializer.getstring(v, multiline, serializer.next_depth( multiline, depth ) ) .. ','
+        .. serializer.sep( multiline )
+    length = i
+  end
+
+  for i, v in pairs(object) do
+    -- convert type into something easier to compare:
+    itype = serializer.indextype( i )
+
+    -- detect if item should be skipped
+    local skip = serializer.is_skippable( itype, i, length )
+
+    if not skip then
+      r = r .. serializer.getstring(v, multiline, serializer.next_depth( multiline, depth ), i)
+          .. ',' .. serializer.sep( multiline )
+    end
+  end
+  r = r .. (multiline and padding or '') .. '}'
+
+  return r
+end
+
+function serializer.serializeString( object )
+  return string.format('%q', object)
+end
+
+function serializer.serializeNumber( object )
+  return tostring( object )
 end
 
 function serializer.next_depth( multiline, depth )
