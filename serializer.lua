@@ -17,13 +17,14 @@ end
 -- and boolean values.
 -- local: fixed to also escape 'return' key . jvh, 20140726.
 function serializer.getstring(object, multiline, depth, name)
-  if depth and depth > 32 then
+  if depth and depth > 4 then
     return "-- object too deep"
   end
 
   depth = depth or 0
-  if multiline == nil then multiline = true end
-  local padding = string.rep('  ', depth) -- can use '\t' if printing to file
+  multiline = multiline or true
+
+  local padding = string.rep('  ', depth)
   local r = padding -- result string
   if name then -- should start from name
     r = r .. (
@@ -37,26 +38,27 @@ function serializer.getstring(object, multiline, depth, name)
     .. ']')
     or tostring(name)) .. ' = '
   end
+
   if type(object) == 'table' then
-    r = r .. '{' .. (multiline and '\n' or ' ')
+    r = r .. '{' .. serializer.sep( multiline )
     local length = 0
+
     for i, v in ipairs(object) do
-      r = r .. serializer.getstring(v, multiline, multiline and (depth + 1) or 0) .. ','
-      .. (multiline and '\n' or ' ')
+      r = r .. serializer.getstring(v, multiline, serializer.next_depth( multiline, depth ) ) .. ','
+      .. serializer.sep( multiline )
       length = i
     end
+
     for i, v in pairs(object) do
-      local itype = type(i) -- convert type into something easier to compare:
-      itype =(itype == 'number') and 1
-      or (itype == 'string') and 2
-      or (itype == 'boolean') and 3
-      or error('Serialize: Unsupported index type "' .. itype .. '"')
-      local skip = -- detect if item should be skipped
-      ((itype == 1) and ((i % 1) == 0) and (i >= 1) and (i <= length)) -- ipairs part
-      or ((itype == 2) and (string.sub(i, 1, 1) == '_')) -- prefixed string
+      -- convert type into something easier to compare:
+      itype = serializer.indextype( i )
+
+      -- detect if item should be skipped
+      local skip = serializer.is_skippable( itype, i, length )
+
       if not skip then
-        r = r .. serializer.getstring(v, multiline, multiline and (depth + 1) or 0, i)
-        .. ',' .. (multiline and '\n' or ' ')
+        r = r .. serializer.getstring(v, multiline, serializer.next_depth( multiline, depth ), i)
+        .. ',' .. serializer.sep( multiline )
       end
     end
     r = r .. (multiline and padding or '') .. '}'
@@ -70,6 +72,40 @@ function serializer.getstring(object, multiline, depth, name)
     error('Cannot serialize value "' .. tostring(object) .. '"')
   end
   return r
+end
+
+function serializer.next_depth( multiline, depth )
+  local next_depth = 0
+  if multiline then
+    next_depth = depth + 1
+  end
+
+  return next_depth
+end
+
+function serializer.sep( multiline )
+  return multiline and '\n' or ' '
+end
+
+function serializer.is_skippable( itype, i, length )
+  local is_skippable =
+    ((itype == 1) and ((i % 1) == 0) and (i >= 1) and (i <= length)) -- ipairs part
+    or ((itype == 2) and (string.sub(i, 1, 1) == '_')) -- prefixed string
+
+  return is_skippable
+end
+
+function serializer.indextype( i )
+  itype = type( i )
+  if itype == "number" then
+    return 1
+  elseif itype == "string" then
+    return 2
+  elseif itype == "boolean" then
+    return 3
+  else
+    error('Serialize: Unsupported index type "' .. itype .. '"')
+  end
 end
 
 return serializer

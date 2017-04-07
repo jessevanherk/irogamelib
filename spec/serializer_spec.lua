@@ -50,13 +50,31 @@ describe( "Serializer", function()
 
     context( "when input is not empty", function()
       local input = {
-        x = { y = 3 },
+        x = { y = 3, z = false },
+        y = { 3, 1, 4, 1, syn = "ack" },
       }
 
       it( "returns the table", function()
-        local expected = "{\n  x = {\n    y = 3,\n  },\n}"
+        local expected = '{\n  y = {\n    3,\n    1,\n    4,\n    1,\n    syn = "ack",\n  },\
+  x = {\n    y = 3,\n    z = false,\n  },\n}'
 
         assert.is.same( expected, serializer.getstring( input ) )
+      end)
+    end)
+
+    context( "when input has a circular reference", function()
+      local a = {
+        ref_to_b = nil,
+      }
+      local b = {
+        ref_to_a = a,
+      }
+      a.ref_to_b = b
+
+      it( "returns the table without recursion", function()
+        local expected = "{\n  ref_to_b = {\n    y = 3,\n  },\n}"
+
+        assert.is.same( expected, serializer.getstring( a ) )
       end)
     end)
   end)
