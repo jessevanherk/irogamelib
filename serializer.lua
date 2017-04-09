@@ -28,10 +28,6 @@ function Serializer:getstring( object, depth, name )
 end
 
 function Serializer:serialize(object, depth, name)
-  if depth and depth > 4 then
-    return "-- object too deep"
-  end
-
   depth = depth or 0
 
   local r = string.rep('  ', depth)
