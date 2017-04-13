@@ -38,7 +38,7 @@ function Serializer:serialize(object, depth, name)
   if type(object) == 'table' then
     local key = self:getKey( object )
     if self:alreadySeen( key ) then
-      r = r .. "nil -- already saw table"
+      r = r .. "nil, -- already saw object: " .. tostring( object )
     else
       self:recordKey( key )
 
