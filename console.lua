@@ -15,8 +15,6 @@ function Console:_init()
 
 end
 
--- context is a table of variables we want to operate on.
--- they get copied in to the top level for evaluating.
 function Console.eval( expression )
   local output
 
