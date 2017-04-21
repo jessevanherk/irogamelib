@@ -1,6 +1,9 @@
 -- console module.
 -- author: Jesse van Herk <jesse@imaginaryrobots.net>
 
+local module_dir = (...):match("(.-)[^%.]+$")
+local Serializer = require( module_dir .. ".serializer" )
+
 local Console = {}
 
 function Console:new( ... )
@@ -12,13 +15,13 @@ function Console:new( ... )
 end
 
 function Console:_init()
-
+  self.serializer = Serializer:new()
 end
 
-function Console.eval( expression )
+function Console:eval( expression )
   local output
 
-  wrapped_expression = Console.wrap( expression )
+  wrapped_expression = self:wrap( expression )
 
   -- try to parse/compile it into lua code
   local func, err_str = loadstring( wrapped_expression )
@@ -30,12 +33,14 @@ function Console.eval( expression )
 
     local success = results[ 1 ]  -- grab the first item, which is the success code
     if success then
-      local escaped = {}
+      local pretty_parts = {}
       -- copy everything else into a new list, escaping as we go
       for i = 2, #results do
-        table.insert( escaped, tostring( results[ i ] ) )
+        local prettified = self:prettify( results[ i ] )
+
+        table.insert( pretty_parts, prettified )
       end
-      output = table.concat( escaped, ", " )
+      output = table.concat( pretty_parts, ", " )
     else
       err_str = results[ 2 ]
       output = '! Evaluation error: ' .. err_str
@@ -51,7 +56,7 @@ function Console.eval( expression )
   return output
 end
 
-function Console.wrap( expression )
+function Console:wrap( expression )
   local wrapped
   if expression:find( "=" ) then
     local var_name = expression:match("(%w*) =")
@@ -60,9 +65,13 @@ function Console.wrap( expression )
     wrapped = "return " .. expression
   end
 
-  print("WRAPPED: ", wrapped)
-
   return wrapped
+end
+
+function Console:prettify( object )
+  local prettified = self.serializer:getstring( object, 0, tostring( object ) )
+
+  return prettified
 end
 
 return Console
