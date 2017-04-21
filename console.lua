@@ -20,23 +20,10 @@ end
 function Console.eval( expression )
   local output = ""
 
-  -- try to parse/compile it into lua code
-  -- catch errors!
-  local func, err_str = loadstring( expression )
+  wrapped_expression = Console.wrap( expression )
 
-  -- Compilation error
-  if not func then
-    if err_str then
-      -- Could be an expression instead of a statement -- try auto-adding return before it
-      func, err_str = loadstring( "return " .. expression )
-      if err_str then
-        output = '! Compilation error: ' .. err_str
-        return false
-      end
-    else
-      output = '! Unknown compilation error'
-    end
-  end
+  -- try to parse/compile it into lua code
+  local func, err_str = loadstring( wrapped_expression )
 
   -- It compiled. Try evaluating it.
   if func then
@@ -55,9 +42,29 @@ function Console.eval( expression )
       err_str = results[ 2 ]
       output = '! Evaluation error: ' .. err_str
     end
+  else -- compilation error.
+    if err_str then
+      output = '! Compilation error: ' .. err_str
+    else
+      output = '! Unknown compilation error'
+    end
   end
 
   return output
+end
+
+function Console.wrap( expression )
+  local wrapped
+  if expression:find( "=" ) then
+    local var_name = expression:match("(%w*) =")
+    wrapped = expression .. ";return " .. var_name
+  else
+    wrapped = "return " .. expression
+  end
+
+  print("WRAPPED: ", wrapped)
+
+  return wrapped
 end
 
 return Console
