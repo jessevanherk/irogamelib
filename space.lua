@@ -25,6 +25,11 @@ function Space:_init( entity_templates, component_templates, systems, system_pre
                                            component_templates,
                                            self.onCreatedEntity )
   self.system_manager = SystemManager:new( systems, system_prefix, self )
+
+  -- convenience shortcuts for systems.
+  for name, system in pairs( self.system_manager.systems ) do
+    self[name] = system
+  end
 end
 
 -- should be called once in the update callback.
@@ -38,6 +43,21 @@ end
 
 function Space:draw()
   self.system_manager:draw()
+end
+
+-- vaguely CSS-ish search for entities.
+-- space:find("#block") - find entities with tag "block"
+-- space:find(".movement") - find entities with component "movement"
+function Space:find( query )
+  if type( query ) ~= "string" then
+    return nil
+  elseif query:find("#") == 1 then
+    return self.entity_manager.getEntitiesWithTag( query )
+  elseif query:find(".") == 1 then
+    return self.entity_manager.getEntitiesWithComponent( query )
+  end
+
+  return nil
 end
 
 -- register signal handlers. called from various systems
@@ -58,6 +78,10 @@ function Space:unregisterSignalHandlers( signal_handles )
   for signal, handle in pairs( signal_handles ) do
     self.signal:remove( signal, handle )
   end
+end
+
+function Space:emit( signal, ... )
+  self.signal:emit( signal, ... )
 end
 
 -- simple callback to tell systems/etc they need to do something.
