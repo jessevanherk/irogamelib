@@ -87,7 +87,7 @@ describe( "serializer", function()
       a.ref_to_b = b
 
       it( "returns the table without recursion", function()
-        local expected = "{\n  ref_to_b = {\n    ref_to_a = nil -- already saw table,\n  },\n}"
+        local expected = "{\n  ref_to_b = {\n    ref_to_a = nil, -- already saw object: " ..  tostring( a ) .. ",\n  },\n}"
 
         assert.is.same( expected, serializer:getstring( a ) )
       end)
