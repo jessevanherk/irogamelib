@@ -1,9 +1,6 @@
 -- console module.
 -- author: Jesse van Herk <jesse@imaginaryrobots.net>
 
-local module_dir = (...):match("(.-)[^%.]+$")
-local Serializer = require( module_dir .. ".serializer" )
-
 local Console = {}
 
 function Console:new( ... )
@@ -15,11 +12,10 @@ function Console:new( ... )
 end
 
 function Console:_init()
-  self.serializer = Serializer:new()
 end
 
 function Console:eval( expression )
-  local output
+  local output_lines = {}
 
   wrapped_expression = self:wrap( expression )
 
@@ -31,29 +27,25 @@ function Console:eval( expression )
     -- we're in the CONSOLE, so we want to access the global environment.
     local results = { pcall( func ) }
 
-    local success = results[ 1 ]  -- grab the first item, which is the success code
+    local success = results[ 1 ]
     if success then
-      local pretty_parts = {}
-      -- copy everything else into a new list, escaping as we go
       for i = 2, #results do
-        local prettified = self:prettify( results[ i ] )
-
-        table.insert( pretty_parts, prettified )
+        result_lines = self:prettify( results[ i ] )
+        for _, line in ipairs( result_lines ) do
+          table.insert( output_lines, line )
+        end
       end
-      output = table.concat( pretty_parts, ", " )
     else
       err_str = results[ 2 ]
-      output = '! Evaluation error: ' .. err_str
+      output = '! Evaluation error: ' .. ( err_str or "Unknown" )
+      output_lines = { output }
     end
-  else -- compilation error.
-    if err_str then
-      output = '! Compilation error: ' .. err_str
-    else
-      output = '! Unknown compilation error'
-    end
+  else
+    local output = '! Compilation error: ' .. ( err_str or "Unknown" )
+    output_lines = { output }
   end
 
-  return output
+  return output_lines
 end
 
 function Console:wrap( expression )
@@ -69,9 +61,24 @@ function Console:wrap( expression )
 end
 
 function Console:prettify( object )
-  local prettified = self.serializer:getstring( object, 0, tostring( object ) )
+  local prettified_lines = {}
 
-  return prettified
+  if type( object ) == "table" then
+    local name_line = tostring( object ) .. " = {"
+    table.insert( prettified_lines, name_line )
+
+    for k, v in pairs( object ) do
+      local prettified = "\t" .. k .. " = " .. tostring( v )
+      table.insert( prettified_lines, prettified )
+    end
+
+    table.insert( prettified_lines, "}" )
+  else
+    prettified = tostring( object )
+    table.insert( prettified_lines, prettified )
+  end
+
+  return prettified_lines
 end
 
 return Console
