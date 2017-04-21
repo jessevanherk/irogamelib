@@ -52,9 +52,9 @@ function Space:find( query )
   if type( query ) ~= "string" then
     return nil
   elseif query:find("#") == 1 then
-    return self.entity_manager.getEntitiesWithTag( query )
+    return self.entity_manager:getEntitiesWithTag( query )
   elseif query:find(".") == 1 then
-    return self.entity_manager.getEntitiesWithComponent( query )
+    return self.entity_manager:getEntitiesWithComponent( query )
   end
 
   return nil
