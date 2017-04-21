@@ -52,9 +52,11 @@ function Space:find( query )
   if type( query ) ~= "string" then
     return nil
   elseif query:find("#") == 1 then
-    return self.entity_manager:getEntitiesWithTag( query )
+    local tag = query:match("#(%w+)")
+    return self.entity_manager:getEntitiesWithTag( tag )
   elseif query:find(".") == 1 then
-    return self.entity_manager:getEntitiesWithComponent( query )
+    local component_name = query:match(".(%w+)")
+    return self.entity_manager:getEntitiesWithComponent( component_name )
   end
 
   return nil
