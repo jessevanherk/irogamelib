@@ -24,19 +24,14 @@ function Console:eval( expression )
 
   -- It compiled. Try evaluating it.
   if func then
-    -- we're in the CONSOLE, so we want to access the global environment.
-    local results = { pcall( func ) }
+    -- call with the global environment without filtering.
+    local result = { pcall( func ) }
+    local success, values = self:splitResults( result )
 
-    local success = results[ 1 ]
     if success then
-      for i = 2, #results do
-        result_lines = self:prettify( results[ i ] )
-        for _, line in ipairs( result_lines ) do
-          table.insert( output_lines, line )
-        end
-      end
+      output_lines = self:prettifyValues( values )
     else
-      err_str = results[ 2 ]
+      err_str = values[ 1 ]
       output = '! Evaluation error: ' .. ( err_str or "Unknown" )
       output_lines = { output }
     end
@@ -48,9 +43,36 @@ function Console:eval( expression )
   return output_lines
 end
 
+function Console:prettifyValues( values )
+  local output_lines = {}
+
+  for _, value in ipairs( values ) do
+    local value_lines = self:prettify( value )
+    for _, line in ipairs( value_lines ) do
+      table.insert( output_lines, line )
+    end
+  end
+
+  return output_lines
+end
+
+function Console:splitResults( results )
+  local success = results[ 1 ]
+
+  local values = {}
+  for i = 2, #results do
+    local value = results[ i ]
+    table.insert( values, value )
+  end
+
+  return success, values
+end
+
 function Console:wrap( expression )
   local wrapped
-  if expression:find( "=" ) then
+  if expression == nil then
+    wrapped = "return nil"
+  elseif expression:find( "=" ) then
     local var_name = expression:match("(%w*) =")
     wrapped = expression .. ";return " .. var_name
   else
@@ -63,7 +85,9 @@ end
 function Console:prettify( object )
   local prettified_lines = {}
 
-  if type( object ) == "table" then
+  if object == nil then
+    table.insert( prettified_lines, "nil" )
+  elseif type( object ) == "table" then
     local name_line = tostring( object ) .. " = {"
     table.insert( prettified_lines, name_line )
 
