@@ -4,7 +4,7 @@ describe( "console", function()
   console = Console:new()
 
   describe( "wrap", function()
-    context( "when input is empty", function()
+    context( "when given a nil", function()
       local input = nil
       local result = console:wrap( input )
 
@@ -30,16 +30,6 @@ describe( "console", function()
 
       it( "returns it directly", function()
         local expected = "return foo == 999"
-        assert.is.same( expected, result )
-      end)
-    end)
-
-    context( "when given an equality check", function()
-      local input = "if x == 999 then print 'ok' end"
-      local result = console:wrap( input )
-
-      it( "returns the whole thing", function()
-        local expected = "return if x == 999 then print 'ok' end"
         assert.is.same( expected, result )
       end)
     end)
@@ -115,4 +105,30 @@ describe( "console", function()
       end)
     end)
   end)
+
+  describe ":eval" do
+    context( "when input can't be compiled", function()
+      local input = "("
+      local result = console:eval( input )
+
+      it( "returns a compilation error", function()
+        local expected = {
+          "! Compilation error: [string \"return (\"]:1: unexpected symbol near '<eof>'",
+        }
+        assert.is.same( expected, result )
+      end)
+    end)
+
+    context( "when input can be compiled but not evaluated", function()
+      local input = "doStuff()"
+      local result = console:eval( input )
+
+      it( "returns an evaluation error", function()
+        local expected = {
+          '! Evaluation error: [string "return doStuff()"]:1: attempt to call global \'doStuff\' (a nil value)',
+        }
+        assert.is.same( expected, result )
+      end)
+    end)
+  end
 end)

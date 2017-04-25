@@ -15,7 +15,7 @@ function Console:_init()
 end
 
 function Console:eval( expression )
-  local output_lines = {}
+  local output_lines
 
   wrapped_expression = self:wrap( expression )
 
@@ -40,7 +40,7 @@ function Console:eval( expression )
     output_lines = { output }
   end
 
-  return output_lines
+  return output_lines or {}
 end
 
 function Console:prettifyValues( values )
@@ -72,6 +72,8 @@ function Console:wrap( expression )
   local wrapped
   if expression == nil then
     wrapped = "return nil"
+  elseif expression:find( "==" ) then
+    wrapped = "return " .. expression
   elseif expression:find( "=" ) then
     local var_name = expression:match("(%w*) =")
     wrapped = expression .. ";return " .. var_name
