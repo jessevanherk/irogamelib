@@ -46,10 +46,13 @@ function Space:draw()
 end
 
 -- vaguely CSS-ish search for entities.
+-- space:find(42) - find entity with ID 42
 -- space:find("#block") - find entities with tag "block"
 -- space:find(".movement") - find entities with component "movement"
 function Space:find( query )
-  if type( query ) ~= "string" then
+  if type( query ) == "number" then
+    return self.entity_manager:getEntityById( query )
+  elseif type( query ) ~= "string" then
     return nil
   elseif query:find("#") == 1 then
     local tag = query:match("#(%w+)")
