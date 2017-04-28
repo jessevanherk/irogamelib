@@ -23,8 +23,10 @@ function SystemManager:_init( systems, system_prefix, space )
   self.draw_systems = {}
   self.systems = {}
 
-  for _, system_name in ipairs( systems ) do
-    self:addSystem( system_name, space )
+  if systems then
+    for _, system_name in ipairs( systems ) do
+      self:addSystem( system_name, space )
+    end
   end
 end
 
