@@ -65,6 +65,15 @@ function Space:find( query )
   return nil
 end
 
+function Space:findFirst( query )
+  local entities = self:find( query )
+  if entities and #entities > 0 then
+    return entities[ 1 ]
+  end
+
+  return nil
+end
+
 -- register signal handlers. called from various systems
 -- return a set of handles that can be used to unregister them later
 function Space:registerSignalHandlers( signal_actions )
