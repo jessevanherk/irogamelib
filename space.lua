@@ -47,7 +47,7 @@ end
 
 -- vaguely CSS-ish search for entities.
 -- space:find(42) - find entity with ID 42
--- space:find("#block") - find entities with tag "block"
+-- space:find("#block_bg") - find entities with tag "block_bg"
 -- space:find(".movement") - find entities with component "movement"
 function Space:find( query )
   if type( query ) == "number" then
@@ -55,10 +55,10 @@ function Space:find( query )
   elseif type( query ) ~= "string" then
     return nil
   elseif query:find("#") == 1 then
-    local tag = query:match("#(%w+)")
+    local tag = query:match("^#([%w_]+)$")
     return self.entity_manager:getEntitiesWithTag( tag )
   elseif query:find(".") == 1 then
-    local component_name = query:match(".(%w+)")
+    local component_name = query:match("^.([%w_]+)$")
     return self.entity_manager:getEntitiesWithComponent( component_name )
   end
 

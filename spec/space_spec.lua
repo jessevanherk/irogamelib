@@ -19,6 +19,10 @@ local component_templates = {
     x = 10,
     y = 12,
   },
+  position_rel = {
+    x = -2,
+    y = -3,
+  },
 }
 
 local entity_templates = {
@@ -36,6 +40,7 @@ describe( "Space", function()
     local space = Space:new( entity_templates, component_templates )
     local rock = space.entity_manager:createEntity( 'rock', nil, { "rocky", "heroic" } )
     local person = space.entity_manager:createEntity( 'person', nil, { "Rocky", "boxer", "heroic" } )
+    local mountain = space.entity_manager:createEntity( nil, { position_rel = {} }, { "rocky_mountain" } )
 
     context( "when searching by ID", function()
       it( "finds the expected results", function()
@@ -65,6 +70,20 @@ describe( "Space", function()
       end)
     end)
 
+    context( "when tag partially matches another tag", function()
+      it( "only finds exact matches", function()
+        local result = space:find("#rocky")
+        assert.is.same( { rock }, result )
+      end)
+    end)
+
+    context( "when tag contains special characters", function()
+      it( "finds the expected matches", function()
+        local result = space:find("#rocky_mountain")
+        assert.is.same( { mountain }, result )
+      end)
+    end)
+
     context( "when searching for a component", function()
       it( "finds the expected results", function()
         local result = space:find(".identity")
@@ -76,6 +95,20 @@ describe( "Space", function()
       it( "finds the expected results", function()
         local result = space:find(".asdasdsad")
         assert.is.same( {}, result )
+      end)
+    end)
+
+    context( "when component partially matches another tag", function()
+      it( "only finds exact matches", function()
+        local result = space:find(".position")
+        assert.is.same( { rock, person }, result )
+      end)
+    end)
+
+    context( "when component name contains special characters", function()
+      it( "finds the expected matches", function()
+        local result = space:find(".position_rel")
+        assert.is.same( { mountain }, result )
       end)
     end)
   end)
