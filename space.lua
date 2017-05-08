@@ -66,12 +66,17 @@ function Space:find( query )
 end
 
 function Space:findFirst( query )
-  local entities = self:find( query )
-  if entities and #entities > 0 then
-    return entities[ 1 ]
+  local entity = nil
+  if type( query ) == "number" then
+    entity = self.entity_manager:getEntityById( query )
+  else
+    local entities = self:find( query )
+    if entities and #entities > 0 then
+      entity = entities[ 1 ]
+    end
   end
 
-  return nil
+  return entity
 end
 
 -- register signal handlers. called from various systems
