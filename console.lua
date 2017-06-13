@@ -75,7 +75,7 @@ function Console:wrap( expression )
   elseif expression:find( "==" ) then
     wrapped = "return " .. expression
   elseif expression:find( "=" ) then
-    local var_name = expression:match("(%w*) =")
+    local var_name = expression:match("(%w*) *=")
     wrapped = expression .. ";return " .. var_name
   else
     wrapped = "return " .. expression
