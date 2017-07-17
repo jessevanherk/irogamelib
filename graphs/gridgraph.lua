@@ -100,9 +100,6 @@ function GridGraph:getNeighbours( point )
 end
 
 function GridGraph:getNeighbourValues( point )
-    local x = point[ 1 ]
-    local y = point[ 2 ]
-
     local neighbours = self:getNeighbours( point )
 
     local values = {}
