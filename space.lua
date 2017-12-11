@@ -45,6 +45,18 @@ function Space:draw()
   self.system_manager:draw()
 end
 
+function Space:reset()
+  -- stop all timers. prevents crashes
+  self.timer:clear()
+
+  self.system_manager:reset()
+
+  -- clear out all entities, so we start from scratch
+  self.entity_manager:deleteAllEntities()
+
+  self.camera:lookAt( 0, 0 )
+end
+
 -- vaguely CSS-ish search for entities.
 -- space:find(42) - find entity with ID 42
 -- space:find("#block_bg") - find entities with tag "block_bg"

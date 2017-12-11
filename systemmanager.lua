@@ -65,4 +65,15 @@ function SystemManager:draw()
   end
 end
 
+-- reset all systems. used when we reload the level/etc.
+function SystemManager:reset()
+  if self.systems then
+    for _, system in pairs( self.systems ) do
+      if system.reset then
+        system:reset()
+      end
+    end
+  end
+end
+
 return SystemManager
