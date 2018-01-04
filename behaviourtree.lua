@@ -1,8 +1,15 @@
+-- implementation of behaviour trees for AI,
+-- using coroutines. 
+-- a behaviour tree object is initialized with an
+-- anonymous function representing the tree.
+-- tasks are the leaf nodes, and are referenced
+-- by name.
 
 BehaviourTree = Class{}
 
 -- use the entity itself as the blackboard
-function BehaviourTree:init( entity, space, tree_function )
+function BehaviourTree:init( tree_function, available_tasks, space, entity )
+  self.tasks = available_tasks
   self.space = space
   self.entity = entity
 
@@ -12,13 +19,18 @@ end
 
 -- advance the behaviour tree coroutine
 function BehaviourTree:tick( dt )
-  coroutine.resume( self.co )
+  local result = coroutine.resume( self.co, dt )
 
   -- check if it finished
   if coroutine.status( co ) == "dead" then
     plog("behaviour is dead, removing it")
     -- it returned - see if it was successful
     local status = "success"
+    -- only explicit false is considered failure
+    if result == false then
+      status = "failure"
+    end
+
     return status
   else
     return "running"
@@ -26,20 +38,21 @@ function BehaviourTree:tick( dt )
 end
 
 -- run a single task (leaf node)
--- this doesn't run anything - it returns a function
--- this should return "success", "failure", or "running"
+-- this should return "success", "failure",
+-- or yield to indicate "running"
 function BehaviourTree:task( task_name )
   -- look up the task by name
-  -- return it, with entity and space as params
-  task_fn = function( entity, space ) plog("doing task " .. task_name ) end
+  task_fn = self.tasks[ task_name ]
+  assert( task_fn, "unknown task '" .. task_name .. "'" )
 
-  return task_fn
+  return task_fn( self.entity, self.space )
 end
 
 -- sequence methods
 
 function BehaviourTree:sequence( ... )
   -- 
+  
 
 end
 

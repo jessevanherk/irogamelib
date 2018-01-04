@@ -1,9 +1,8 @@
 --------------------------------
 -- Entity Manager , takes care of all creation/update/search of entities.
 -- entities and components are JUST DATA - think of this like a DB Model,
--- returning resultsets, NOT objects. Performance matters, so don't split
--- things into sub classes.
--- should NOT know about rendering engine or systems.
+-- returning resultsets, NOT objects.
+-- operations on entity data should be done by systems
 
 local EntityManager = {}
 

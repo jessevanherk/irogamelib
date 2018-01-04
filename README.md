@@ -7,5 +7,6 @@ This is a set of useful libraries for developing games using Lua and Love2d.  It
 - Utility libraries
 - Queue/Stack and Priority Queue implementations
 - basic Internationalization (i18n) library
+- behaviour tree library
 
 Released under the MIT license. See LICENSE for details.
