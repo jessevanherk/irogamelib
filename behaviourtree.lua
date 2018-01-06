@@ -1,12 +1,15 @@
--- implementation of behaviour trees for AI,
--- using coroutines. 
--- a behaviour tree object is initialized with an
--- anonymous function representing the tree.
--- tasks are the leaf nodes, and are referenced
--- by name.
+-- implementation of behaviour trees for AI, using coroutines. 
+-- a behaviour tree object is initialized with a nested list
+-- of nodes.
+-- Each node is a pair: a string represnting the node type, and:
+-- a single node, for decorators
+-- a list of node, for sequences/etc
+-- tasks are the leaf nodes, and take the task name as a string
 
 BehaviourTree = Class{}
 
+-- create a new behaviour tree.
+-- this doesn't do any tick
 -- use the entity itself as the blackboard
 function BehaviourTree:init( tree_root, available_tasks, space, entity )
   self.tasks = available_tasks
@@ -14,7 +17,10 @@ function BehaviourTree:init( tree_root, available_tasks, space, entity )
   self.entity = entity
 
   -- create the coroutine for the behaviour
-  self.co = coroutine.create( function() return self:runTree( tree_root ) end )
+  self.co = coroutine.create( 
+    function()
+      return self:runTree( tree_root )
+    end )
 end
 
 -- advance the behaviour tree coroutine
@@ -32,11 +38,8 @@ function BehaviourTree:tick( dt )
 end
 
 function BehaviourTree:runTree( tree )
-  -- get the current node type
-  local node = tree[ 1 ]
-  local node_type = node[ 1 ]
-  -- parse out the rest of the args
-  local arguments = node[ 2 ]
+  -- get the current node type and args
+  local node_type, arguments = unpack( tree[ 1 ] )
 
   -- call the appropriate handler method
   local handler = self[ node_type ]
@@ -47,7 +50,7 @@ function BehaviourTree:runTree( tree )
 end
 
 -- run a single task (leaf node)
--- this should return "success", "failure",
+-- this should return true or false
 -- or yield to indicate "running"
 function BehaviourTree:task( task_name )
   -- look up the task by name
@@ -55,7 +58,7 @@ function BehaviourTree:task( task_name )
   assert( task_fn, "unknown task name '" .. task_name .. "'" )
 
   -- actually run the task.
-  -- nil return result is treated as success.
+  -- nil result is treated as success.
   local result = task_fn( self.entity, self.space )
   if result ~= nil and result == false then
     return false
@@ -64,13 +67,11 @@ function BehaviourTree:task( task_name )
   return true
 end
 
--- sequence methods
-
 -- run each node in order, until a failure
 function BehaviourTree:sequence( child_nodes )
   for _, node in ipairs( child_nodes ) do
-    local result = self:runTree( node )
-    if result == false then
+    local child_result = self:runTree( node )
+    if child_result == false then
       -- stop processing. and return failure
       return false
     end
@@ -83,13 +84,11 @@ end
 -- FIXME: detect spinloops and error out
 function BehaviourTree:repeatSequence( child_nodes )
   while true do
-    for _, node in ipairs( child_nodes ) do
-      local result = self:runTree( node )
-      if result == false then
-        -- stop processing. and return failure
-        return false
-      end
-    end
+    self:sequence( child_nodes )
+
+    -- only want to run the sequence once per tick.
+    -- avoid spinloop by yielding out
+    coroutine.yield()
   end
   
   return true
