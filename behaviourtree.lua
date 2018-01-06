@@ -6,12 +6,21 @@
 -- a list of node, for sequences/etc
 -- tasks are the leaf nodes, and take the task name as a string
 
-BehaviourTree = Class{}
+BehaviourTree = {}
+
+-- magic constructor for the system. real init code goes in init().
+function BehaviourTree:new( ... )
+  local instance = {}
+  setmetatable( instance, self )
+  self.__index = self
+  self._init( instance, ... )
+  return instance
+end
 
 -- create a new behaviour tree.
 -- this doesn't do any tick
 -- use the entity itself as the blackboard
-function BehaviourTree:init( tree_root, available_tasks, space, entity )
+function BehaviourTree:_init( tree_root, available_tasks, space, entity )
   self.tasks = available_tasks
   self.space = space
   self.entity = entity
