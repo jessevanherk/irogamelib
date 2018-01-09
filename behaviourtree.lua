@@ -19,11 +19,14 @@ end
 
 -- create a new behaviour tree.
 -- this doesn't do any tick
--- use the entity itself as the blackboard
-function BehaviourTree:_init( tree_root, available_tasks, space, entity )
+-- context is a table/object contaiming whatever other data/methods
+-- are needed by your tasks. Could be your space/world.
+-- blackboard is a table/object used to store data specific to
+-- this tree. Could be your entity object.
+function BehaviourTree:_init( tree_root, available_tasks, context, blackboard )
   self.tasks = available_tasks
-  self.space = space
-  self.entity = entity
+  self.context = context
+  self.blackboard = blackboard
 
   -- create the coroutine for the behaviour
   self.co = coroutine.create( 
@@ -68,7 +71,7 @@ function BehaviourTree:task( task_name )
 
   -- actually run the task.
   -- nil result is treated as success.
-  local result = task_fn( self.entity, self.space )
+  local result = task_fn( self.blackboard, self.context )
   if result ~= nil and result == false then
     return false
   end
