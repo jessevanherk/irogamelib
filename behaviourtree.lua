@@ -28,10 +28,13 @@ function BehaviourTree:_init( tree_root, available_tasks, context, blackboard )
   self.context = context
   self.blackboard = blackboard
 
+  assert( tree_root, "tree cannot be nil" )
+  assert( available_tasks, "tasks cannot be nil" )
+
   -- create the coroutine for the behaviour
   self.co = coroutine.create( 
     function()
-      return self:runTree( tree_root )
+      return self:runNode( tree_root )
     end )
 end
 
@@ -49,16 +52,16 @@ function BehaviourTree:tick( dt )
   return is_running
 end
 
-function BehaviourTree:runTree( tree )
+function BehaviourTree:runNode( node )
   -- get the current node type and args
-  local node_type, arguments = unpack( tree[ 1 ] )
+  local node_type, arguments = unpack( node )
 
   -- call the appropriate handler method
   local handler = self[ node_type ]
   assert( handler, "unknown node type '" .. node_type .. "'" )
 
   -- return that method's result, either success or failure
-  return handler( arguments )
+  return handler( self, arguments )
 end
 
 -- run a single task (leaf node)
@@ -82,7 +85,7 @@ end
 -- run each node in order, until a failure
 function BehaviourTree:sequence( child_nodes )
   for _, node in ipairs( child_nodes ) do
-    local child_result = self:runTree( node )
+    local child_result = self:runNode( node )
     if child_result == false then
       -- stop processing. and return failure
       return false
@@ -109,7 +112,7 @@ end
 -- run child nodes until one succeeded
 function BehaviourTree:any( child_nodes )
   for _, node in ipairs( child_nodes ) do
-    local child_result = self:runTree( node )
+    local child_result = self:runNode( node )
     if child_result == true then
       -- stop processing. and return success
       return true
@@ -122,17 +125,17 @@ end
 -- decorators
 
 function BehaviourTree:succeed( child )
-  local result = self:runTree( child )
+  local result = self:runNode( child )
   return true
 end
 
 function BehaviourTree:fail( child )
-  local result = self:runTree( child )
+  local result = self:runNode( child )
   return false
 end
 
 function BehaviourTree:invert( child )
-  local result = self:runTree( child )
+  local result = self:runNode( child )
   return not result
 end
 
