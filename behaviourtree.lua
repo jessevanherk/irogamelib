@@ -74,7 +74,7 @@ end
 function BehaviourTree:task( task_name )
   -- look up the task by name
   task_fn = self.tasks[ task_name ]
-  assert( task_fn, "unknown task name '" .. task_name .. "'" )
+  assert( task_fn, "unknown task name '" .. tostring(task_name) .. "'" )
 
   -- actually run the task.
   -- nil result is treated as success.

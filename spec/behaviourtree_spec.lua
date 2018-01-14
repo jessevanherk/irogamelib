@@ -4,9 +4,11 @@ BehaviourTree = require( "behaviourtree" )
 
 describe( "BehaviourTree", function()
   local test_tasks = {
-    return_nil   = function() return nil end,
-    return_true  = function() return true end,
-    return_false = function() return false end,
+    return_nil    = function() return nil end,
+    return_true   = function() return true end,
+    return_false  = function() return false end,
+    return_string = function() return "something" end,
+    return_zero   = function() return 0 end,
   }
   local tree = BehaviourTree:new( {}, test_tasks, {}, {} )
 
@@ -61,33 +63,111 @@ describe( "BehaviourTree", function()
 
   describe( "runNode()", function()
     context( "when node is valid", function()
+      local node = { "task", "return_false" }
+
       it( "does not throw an error", function()
+        assert.has_no_error( function() tree:runNode( node ) end )
       end)
     end)
 
     context( "when node is nil", function()
+      local node = nil
+
       it( "throws an error", function()
         local expected = "node must be a table"
-        assert.has_error( function() tree:runNode( nil ) end, expected )
+        assert.has_error( function() tree:runNode( node ) end, expected )
       end)
     end)
 
     context( "when node is not a table", function()
+      local node = "not_a_table"
+
       it( "throws an error", function()
         local expected = "node must be a table"
-        assert.has_error( function() tree:runNode( "not_a_table" ) end, expected )
+        assert.has_error( function() tree:runNode( node ) end, expected )
       end)
     end)
 
     context( "when passed multiple nodes", function()
+      local nodes = { { "node1" }, { "node2" } }
       it( "throws an error", function()
         local expected = "invalid node format - must be {string, argument}"
-        assert.has_error( function() tree:runNode( { { "node1" }, { "node2" } } ) end, expected )
+        assert.has_error( function() tree:runNode( nodes ) end, expected )
       end)
     end)
   end)
 
   describe( "task()", function()
+    context( "when task name is nil", function()
+      local task_name = nil
+
+      it( "throws an error", function()
+        local expected = "unknown task name 'nil'"
+        assert.has_error( function() tree:task( task_name ) end, expected )
+      end)
+    end)
+
+    context( "when task name is a string", function()
+      context( "when the task name is not found", function()
+        local task_name = "no_such_task"
+
+        it( "throws an error", function()
+          local expected = "unknown task name 'no_such_task'"
+          assert.has_error( function() tree:task( task_name ) end, expected )
+        end)
+      end)
+
+      context( "when the task name exists", function()
+        it( "runs the task", function()
+        end)
+
+        context( "when the task returns true", function()
+          local task_name = "return_true"
+
+          it( "returns true", function()
+            local result = tree:task( task_name )
+            assert.is.equal( result, true )
+          end)
+        end)
+
+        context( "when the task returns false", function()
+          local task_name = "return_false"
+
+          it( "returns false", function()
+            local result = tree:task( task_name )
+            assert.is.equal( result, false )
+          end)
+        end)
+
+        context( "when the task returns nil", function()
+          local task_name = "return_nil"
+
+          it( "returns true", function()
+            local result = tree:task( task_name )
+            assert.is.equal( result, true )
+          end)
+        end)
+
+        context( "when the task returns zero", function()
+          local task_name = "return_zero"
+
+          -- in lua, all values other than nil and false are truthy.
+          it( "returns true", function()
+            local result = tree:task( task_name )
+            assert.is.equal( result, true )
+          end)
+        end)
+
+        context( "when the task returns a misc truthy value", function()
+          local task_name = "return_string"
+
+          it( "returns true", function()
+            local result = tree:task( task_name )
+            assert.is.equal( result, true )
+          end)
+        end)
+      end)
+    end)
   end)
 
   describe( "sequence()", function()
