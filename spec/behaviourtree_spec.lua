@@ -119,6 +119,13 @@ describe( "BehaviourTree", function()
 
       context( "when the task name exists", function()
         it( "runs the task", function()
+          local task_name = "return_true"
+          local task_spy = spy.on( test_tasks, task_name )
+
+          tree:task( task_name )
+          assert.spy( test_tasks[ task_name ] ).was.called_with( tree.blackboard, tree.context )
+
+          test_tasks[ task_name ]:revert()  -- revert the spy!
         end)
 
         context( "when the task returns true", function()
