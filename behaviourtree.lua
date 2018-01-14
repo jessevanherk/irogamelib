@@ -53,6 +53,10 @@ function BehaviourTree:tick( dt )
 end
 
 function BehaviourTree:runNode( node )
+  -- make sure we only have one child node
+  assert( type( node ) == "table", "node must be a table" )
+  assert( type( node[ 1 ] ) == "string", "invalid node format - must be {string, argument}" )
+
   -- get the current node type and args
   local node_type, arguments = unpack( node )
 
