@@ -120,7 +120,7 @@ describe( "BehaviourTree", function()
       context( "when the task name exists", function()
         it( "runs the task", function()
           local task_name = "return_true"
-          local task_spy = spy.on( test_tasks, task_name )
+          spy.on( test_tasks, task_name )
 
           tree:task( task_name )
           assert.spy( test_tasks[ task_name ] ).was.called_with( tree.blackboard, tree.context )
@@ -178,6 +178,46 @@ describe( "BehaviourTree", function()
   end)
 
   describe( "sequence()", function()
+    context( "when all nodes succeed", function()
+      local nodes = {
+        { "task", "return_true" },
+        { "task", "return_true" },
+        { "task", "return_true" },
+      }
+
+      it( "runs all nodes", function()
+        spy.on( tree, "runNode" )
+
+        tree:sequence( nodes )
+        assert.spy( tree.runNode ).was.called( 3 )
+
+        tree.runNode:revert()  -- revert it!
+      end)
+
+      it( "returns true", function()
+        local result = tree:sequence( nodes )
+        assert.is.equal( result, true )
+      end)
+    end)
+
+    context( "when a node fails", function()
+      it( "runs all of the preceding nodes", function()
+      end)
+
+      it( "doesn't run any of the following nodes", function()
+      end)
+
+      it( "returns false", function()
+      end)
+    end)
+
+    context( "when all nodes fail", function()
+      it( "runs all of the nodes", function()
+      end)
+
+      it( "returns false", function()
+      end)
+    end)
   end)
 
   describe( "repeatSequence()", function()
