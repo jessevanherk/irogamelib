@@ -125,7 +125,7 @@ describe( "BehaviourTree", function()
           tree:task( task_name )
           assert.spy( test_tasks[ task_name ] ).was.called_with( tree.blackboard, tree.context )
 
-          test_tasks[ task_name ]:revert()  -- revert the spy!
+          test_tasks[ task_name ]:revert()
         end)
 
         context( "when the task returns true", function()
@@ -191,7 +191,7 @@ describe( "BehaviourTree", function()
         tree:sequence( nodes )
         assert.spy( tree.runNode ).was.called( 3 )
 
-        tree.runNode:revert()  -- revert it!
+        tree.runNode:revert()
       end)
 
       it( "returns true", function()
@@ -235,7 +235,7 @@ describe( "BehaviourTree", function()
       tree:succeed( child )
       assert.stub( tree.runNode ).was.called_with( tree, child )
 
-      tree.runNode:revert()  -- revert the stub!
+      tree.runNode:revert()
     end)
 
     context( "When the child returns true", function()
@@ -266,7 +266,7 @@ describe( "BehaviourTree", function()
       tree:succeed( child )
       assert.stub( tree.runNode ).was.called_with( tree, child )
 
-      tree.runNode:revert()  -- revert the stub!
+      tree.runNode:revert()
     end)
 
     context( "When the child returns true", function()
@@ -290,7 +290,7 @@ describe( "BehaviourTree", function()
       tree:succeed( child )
       assert.stub( tree.runNode ).was.called_with( tree, child )
 
-      tree.runNode:revert()  -- revert the stub!
+      tree.runNode:revert()
     end)
 
     context( "When the child returns true", function()
