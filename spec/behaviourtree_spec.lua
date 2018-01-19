@@ -206,26 +206,36 @@ describe( "BehaviourTree", function()
     end)
 
     context( "when a node fails", function()
+      local nodes = {
+        { "succeed", { "noop", {} } },
+        { "task", "return_false" },
+        { "invert", { "noop", {} } },
+      }
+
       it( "runs all of the preceding nodes", function()
-        assert.is.equal( false, true )
+        spy.on( tree, "task" )
+        spy.on( tree, "succeed" )
+
+        tree:sequence( nodes )
+        assert.spy( tree.succeed ).was.called( 1 )
+        assert.spy( tree.task ).was.called( 1 )
+
+        tree.task:revert()
+        tree.succeed:revert()
       end)
 
       it( "doesn't run any of the following nodes", function()
-        assert.is.equal( false, true )
+        spy.on( tree, "invert" )
+
+        tree:sequence( nodes )
+        assert.spy( tree.invert ).was.called( 0 )
+
+        tree.invert:revert()
       end)
 
       it( "returns false", function()
-        assert.is.equal( false, true )
-      end)
-    end)
-
-    context( "when all nodes fail", function()
-      it( "runs all of the nodes", function()
-        assert.is.equal( false, true )
-      end)
-
-      it( "returns false", function()
-        assert.is.equal( false, true )
+        local result = tree:sequence( nodes )
+        assert.is.equal( result, false )
       end)
     end)
   end)

@@ -143,4 +143,9 @@ function BehaviourTree:invert( child )
   return not result
 end
 
+-- this mainly exists for testing, and for succeed/fail with no actual child.
+function BehaviourTree:noop()
+  return nil
+end
+
 return BehaviourTree
