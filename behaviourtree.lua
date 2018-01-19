@@ -148,4 +148,9 @@ function BehaviourTree:noop()
   return nil
 end
 
+-- this mainly exists for testing
+function BehaviourTree:yield()
+  coroutine.yield()
+end
+
 return BehaviourTree

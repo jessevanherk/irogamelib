@@ -241,9 +241,61 @@ describe( "BehaviourTree", function()
   end)
 
   describe( "repeatSequence()", function()
-    context( "FIXME", function()
-      it( "FIXME", function()
-        assert.is.equal( false, true )
+    context( "when sequence yields", function()
+      local nodes = {
+        { "task", "return_true" },
+        { "yield", {} },
+        { "noop", {} },
+      }
+
+      it( "runs the preceding tasks", function()
+        spy.on( tree, "task" )
+
+        local co = coroutine.create( function() tree:repeatSequence( nodes ) end)
+        coroutine.resume( co )
+
+        assert.spy( tree.task ).was.called( 1 )
+
+        tree.task:revert()
+      end)
+
+      it( "does not run the following tasks", function()
+        spy.on( tree, "noop" )
+
+        local co = coroutine.create( function() tree:repeatSequence( nodes ) end)
+        coroutine.resume( co )
+
+        assert.spy( tree.noop ).was.called( 0 )
+
+        tree.noop:revert()
+      end)
+    end)
+
+    context( "when sequence doesn't yield", function()
+      local nodes = {
+        { "task", "return_true" },
+      }
+
+      it( "runs the sequence once", function()
+        spy.on( tree, "runNode" )
+
+        local co = coroutine.create( function() tree:repeatSequence( nodes ) end)
+        coroutine.resume( co )
+
+        assert.spy( tree.runNode ).was.called( 1 )
+
+        tree.runNode:revert()
+      end)
+
+      it( "yields", function()
+        stub( tree, "sequence" )
+
+        local co = coroutine.create( function() tree:repeatSequence( nodes ) end)
+        coroutine.resume( co )
+
+        assert.is.equal(coroutine.status( co ), "suspended" )
+
+        tree.sequence:revert()
       end)
     end)
   end)
