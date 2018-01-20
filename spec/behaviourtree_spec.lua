@@ -12,7 +12,7 @@ describe( "BehaviourTree", function()
   }
   local tree = BehaviourTree:new( {}, test_tasks, {}, {} )
 
-  describe( "new()", function()
+  describe( "#new", function()
     context( "when no tree data is provided", function()
       it( "throws an error", function()
         local expected = "tree cannot be nil"
@@ -53,20 +53,51 @@ describe( "BehaviourTree", function()
 
       it( "has a valid coroutine", function()
         assert.is.truthy( new_tree.co ~= nil )
-        assert.is.equal( coroutine.status( new_tree.co ), "suspended" )
+        assert.is.equal( "suspended", coroutine.status( new_tree.co ) )
       end)
     end)
   end)
 
-  describe( "tick()", function()
-    context( "FIXME", function()
-      it( "FIXME", function()
-        assert.is.equal( false, true )
+  describe( "#tick", function()
+    context( "when coroutine is already dead", function()
+      local nodes = {
+        { "noop", {} },
+      }
+      local dead_tree = BehaviourTree:new( nodes, test_tasks, {}, {} )
+      coroutine.resume( dead_tree.co )
+
+      it( "throws an error", function()
+        local expected = "cannot resume dead coroutine"
+        assert.has_error( function() dead_tree:tick( 0 ) end, expected )
+      end)
+    end)
+
+    context( "when coroutine is not dead", function()
+      context( "when tree completes", function()
+        local nodes = { "noop", {} }
+        local done_tree = BehaviourTree:new( nodes, test_tasks, {}, {} )
+
+        it( "returns true", function()
+          local result = done_tree:tick( 0 )
+          assert.is.equal( true, result )
+        end)
+      end)
+
+      context( "when tree does not complete", function()
+        local nodes = { "yield", {} }
+
+        local sleepy_tree = BehaviourTree:new( nodes, test_tasks, {}, {} )
+
+        it( "returns false", function()
+          local result = sleepy_tree:tick( 0 )
+          assert.is.equal("suspended", coroutine.status( sleepy_tree.co ) )
+          assert.is.equal( false, result )
+        end)
       end)
     end)
   end)
 
-  describe( "runNode()", function()
+  describe( "#runNode", function()
     context( "when node is valid", function()
       local node = { "task", "return_false" }
 
@@ -94,15 +125,15 @@ describe( "BehaviourTree", function()
     end)
 
     context( "when passed multiple nodes", function()
-      local nodes = { { "node1" }, { "node2" } }
+      local nodes = { nil, "not_a_node" }
       it( "throws an error", function()
-        local expected = "invalid node format - must be {string, argument}"
+        local expected = "invalid node format - must be {string, argument}. Got { nil, not_a_node }"
         assert.has_error( function() tree:runNode( nodes ) end, expected )
       end)
     end)
   end)
 
-  describe( "task()", function()
+  describe( "#task", function()
     context( "when task name is nil", function()
       local task_name = nil
 
@@ -182,7 +213,7 @@ describe( "BehaviourTree", function()
     end)
   end)
 
-  describe( "sequence()", function()
+  describe( "#sequence", function()
     context( "when all nodes succeed", function()
       local nodes = {
         { "task", "return_true" },
@@ -240,7 +271,7 @@ describe( "BehaviourTree", function()
     end)
   end)
 
-  describe( "repeatSequence()", function()
+  describe( "#repeatSequence", function()
     context( "when sequence yields", function()
       local nodes = {
         { "task", "return_true" },
@@ -300,15 +331,43 @@ describe( "BehaviourTree", function()
     end)
   end)
 
-  describe( "any()", function()
-    context( "FIXME", function()
-      it( "FIXME", function()
-        assert.is.equal( false, true )
+  describe( "#any", function()
+    context( "when a child returns true", function()
+      local nodes = {
+        { "fail", { "noop", {} } },
+        { "task", "return_true" },
+        { "invert", { "noop", {} } },
+      }
+
+      it( "runs all of the preceding nodes", function()
+        spy.on( tree, "task" )
+        spy.on( tree, "fail" )
+
+        tree:any( nodes )
+        assert.spy( tree.fail ).was.called( 1 )
+        assert.spy( tree.task ).was.called( 1 )
+
+        tree.task:revert()
+        tree.fail:revert()
+      end)
+
+      it( "doesn't run any of the following nodes", function()
+        spy.on( tree, "invert" )
+
+        tree:any( nodes )
+        assert.spy( tree.invert ).was.called( 0 )
+
+        tree.invert:revert()
+      end)
+
+      it( "returns true", function()
+        local result = tree:any( nodes )
+        assert.is.equal( true, result )
       end)
     end)
   end)
 
-  describe( "succeed()", function()
+  describe( "#succeed", function()
     local child = { "task", "return_nil" }
 
     it( "runs the child", function()
@@ -339,7 +398,7 @@ describe( "BehaviourTree", function()
     end)
   end)
 
-  describe( "fail()", function()
+  describe( "#fail", function()
     local child = { "task", "return_false" }
 
     it( "runs the child", function()
@@ -363,7 +422,7 @@ describe( "BehaviourTree", function()
     end)
   end)
 
-  describe( "invert()", function()
+  describe( "#invert", function()
     local child = { "fake_node", {} }
 
     it( "runs the child", function()

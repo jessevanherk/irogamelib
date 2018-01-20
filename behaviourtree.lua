@@ -31,31 +31,38 @@ function BehaviourTree:_init( tree_root, available_tasks, context, blackboard )
   assert( tree_root, "tree cannot be nil" )
   assert( available_tasks, "tasks cannot be nil" )
 
+  self.co = self:createCoroutine( tree_root )
+end
+
+function BehaviourTree:createCoroutine( tree_root )
   -- create the coroutine for the behaviour
-  self.co = coroutine.create( 
+  local co = coroutine.create(
     function()
       return self:runNode( tree_root )
     end )
+
+  return co
 end
 
 -- advance the behaviour tree coroutine
 function BehaviourTree:tick( dt )
-  local is_running = true
-  local result = coroutine.resume( self.co, dt )
-
-  -- check if it finished
-  if coroutine.status( co ) == "dead" then
-    plog("behaviour is dead, it should be removed")
-    is_running = false
+  local is_done = false
+  local success, result = coroutine.resume( self.co, dt )
+  if not success then
+    error( result )
   end
 
-  return is_running
+  if coroutine.status( self.co ) == "dead" then
+    is_done = true
+  end
+
+  return is_done
 end
 
 function BehaviourTree:runNode( node )
   -- make sure we only have one child node
   assert( type( node ) == "table", "node must be a table" )
-  assert( type( node[ 1 ] ) == "string", "invalid node format - must be {string, argument}" )
+  assert( type( node[ 1 ] ) == "string", "invalid node format - must be {string, argument}. Got { " .. tostring( node[ 1 ] ) .. ", " .. tostring( node[ 2 ] ) .. " }" )
 
   -- get the current node type and args
   local node_type, arguments = unpack( node )
