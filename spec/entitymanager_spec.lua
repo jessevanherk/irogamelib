@@ -127,150 +127,136 @@ describe( "EntityManager", function()
       end)
     end)
 
-    context( "when only entity template provided", function()
-      local tags = { 'billy', 'heroic' }
-      local entity = EM:createEntity( 'person', nil, tags )
+    context( "when arguments are present", function()
+      local tags = { 'awesome', 'heroic' }
+      local generic_entity = EM:createEntity( 'person', {}, tags )
 
       it( "has an entity id", function()
-        assert.is_true( entity.id > 0 )
+        assert.is_true( generic_entity.id > 0 )
       end)
 
       it( "is in the main entities list", function()
-        assert.is_truthy( EM.entities[ entity.id ] )
+        assert.is_truthy( EM.entities[ generic_entity.id ] )
       end)
 
-      it( "has the components from the template", function()
-        local expected = { 'animation', 'complex', 'hitbox', 'identity', 'position' }
-        local result = table_keys( entity.components )
-        table.sort( result )
-        assert.is_same( expected, result )
+      context( "when only entity template provided", function()
+        local entity = EM:createEntity( 'person', nil, tags )
+
+        it( "has the components from the template", function()
+          local expected = { 'animation', 'complex', 'hitbox', 'identity', 'position' }
+          local result = table_keys( entity.components )
+          table.sort( result )
+          assert.is_same( expected, result )
+        end)
+
+        it( "has its own copies of the components", function()
+          assert.is_not_equal( EM.component_templates.position, entity.position )
+          assert.is_not_equal( EM.entity_templates.person.position, entity.position )
+          assert.is_not_equal( EM.component_templates.animation.frames, entity.animation.frames )
+          assert.is_not_equal( EM.entity_templates.person.animation.frames, entity.animation.frames )
+        end)
+
+        it( "has the values from the entity template", function()
+          local expected = { x = 42, y = 12, angle = 0 }
+          assert.is_same( expected, entity.position )
+          assert.is_equal( 4, entity.complex.nested.tables.are.difficult.values[ 3 ] )
+        end)
+
+        it( "is auto-tagged with the template name", function()
+          assert.is_true( entity.tags.person )
+        end)
+
+        it( "has the specified tags", function()
+          assert.is_true( entity.tags.awesome )
+          assert.is_true( entity.tags.heroic )
+        end)
       end)
 
-      it( "has its own copies of the components", function()
-        assert.is_not_equal( EM.component_templates.position, entity.position )
-        assert.is_not_equal( EM.entity_templates.person.position, entity.position )
-        assert.is_not_equal( EM.component_templates.animation.frames, entity.animation.frames )
-        assert.is_not_equal( EM.entity_templates.person.animation.frames, entity.animation.frames )
+      context( "when adding components without template", function()
+        local overrides = {
+          identity = { first_name = 'Susan' }, position = { x = -4 },
+        }
+        local entity = EM:createEntity( nil, overrides, tags )
+
+        it( "has the specified components", function()
+          local expected = { 'identity', 'position' }
+          local result = table_keys( entity.components )
+          table.sort( result )
+          assert.is_same( expected, result )
+        end)
+
+        it( "has its own copies of the components", function()
+          assert.is_not_equal( EM.component_templates.position, entity.position )
+          assert.is_not_equal( EM.component_templates.identity, entity.identity )
+        end)
+
+        it( "has values from the component template", function()
+          assert.is_equal( 'Smith', entity.identity.last_name )
+          assert.is_equal( 12, entity.position.y )
+        end)
+
+        it( "has values from the overrides", function()
+          assert.is_equal( 'Susan', entity.identity.first_name )
+          assert.is_equal( -4, entity.position.x )
+        end)
+
+        it( "has the expected tags", function()
+          local entity_tags = table_keys( entity.tags )
+          table.sort( entity_tags )
+          local expected = { 'awesome', 'heroic' }
+          assert.is_same( expected, entity_tags )
+        end)
       end)
 
-      it( "has the values from the entity template", function()
-        local expected = { x = 42, y = 12, angle = 0 }
-        assert.is_same( expected, entity.position )
-        assert.is_equal( 4, entity.complex.nested.tables.are.difficult.values[ 3 ] )
-      end)
+      context( "when specifying both template and overrides", function()
+        local overrides = {
+          identity = { first_name = 'Susan' }, position = { x = -4 },
+        }
+        local entity = EM:createEntity( 'person', overrides, tags )
 
-      it( "is auto-tagged with the template name", function()
-        assert.is_true( entity.tags.person )
-      end)
+        it( "has the expected components", function()
+          local expected = { 'animation', 'complex', 'hitbox', 'identity', 'position' }
+          local result = table_keys( entity.components )
+          table.sort( result )
+          assert.is_same( expected, result )
+        end)
 
-      it( "has the specified tags", function()
-        assert.is_true( entity.tags.billy )
-        assert.is_true( entity.tags.heroic )
-      end)
-    end)
+        it( "has its own copies of the components", function()
+          assert.is_not_equal( EM.component_templates.position, entity.position )
+          assert.is_not_equal( EM.component_templates.identity, entity.identity )
+          assert.is_not_equal( EM.entity_templates.person.position, entity.position )
+          assert.is_not_equal( EM.component_templates.animation.frames, entity.animation.frames )
+          assert.is_not_equal( EM.entity_templates.person.animation.frames, entity.animation.frames )
+        end)
 
-    context( "when adding components without template", function()
-      local overrides = {
-        identity = { first_name = 'Susan' }, position = { x = -4 },
-      }
-      local tags = { 'susan', 'awesome' }
-      local entity = EM:createEntity( nil, overrides, tags )
+        it( "has values from the component template", function()
+          assert.is_equal( 'Smith', entity.identity.last_name )
+          assert.is_equal( 12, entity.position.y )
+        end)
 
-      it( "has an entity id", function()
-        assert.is_true( entity.id > 0 )
-      end)
+        it( "has values from the entity template", function()
+          assert.is_equal( 9, entity.complex.nested.tables.are.difficult.values[ 6 ] )
+          assert.is_equal( 'circle', entity.hitbox.shape )
+        end)
 
-      it( "is in the main entities list", function()
-        assert.is_truthy( EM.entities[ entity.id ] )
-      end)
+        it( "overrides strings", function()
+          assert.is_equal( 'Susan', entity.identity.first_name )
+        end)
 
-      it( "has the specified components", function()
-        local expected = { 'identity', 'position' }
-        local result = table_keys( entity.components )
-        table.sort( result )
-        assert.is_same( expected, result )
-      end)
+        it( "overrides numbers", function()
+          assert.is_equal( -4, entity.position.x )
+        end)
 
-      it( "has its own copies of the components", function()
-        assert.is_not_equal( EM.component_templates.position, entity.position )
-        assert.is_not_equal( EM.component_templates.identity, entity.identity )
-      end)
+        it( "overrides boolean values", function()
+          assert.is_equal( false, entity.animation.is_loop )
+        end)
 
-      it( "has values from the component template", function()
-        assert.is_equal( 'Smith', entity.identity.last_name )
-        assert.is_equal( 12, entity.position.y )
-      end)
-
-      it( "has values from the overrides", function()
-        assert.is_equal( 'Susan', entity.identity.first_name )
-        assert.is_equal( -4, entity.position.x )
-      end)
-
-      it( "has the expected tags", function()
-        local entity_tags = table_keys( entity.tags )
-        table.sort( entity_tags )
-        local expected = { 'awesome', 'susan' }
-        assert.is_same( expected, entity_tags )
-      end)
-    end)
-
-    context( "when specifying both template and overrides", function()
-      local overrides = {
-        identity = { first_name = 'Susan' }, position = { x = -4 },
-      }
-      local tags = { 'susan', 'awesome' }
-      local entity = EM:createEntity( 'person', overrides, tags )
-
-      it( "has an entity id", function()
-        assert.is_true( entity.id > 0 )
-      end)
-
-      it( "is in the main entities list", function()
-        assert.is_truthy( EM.entities[ entity.id ] )
-      end)
-
-      it( "has the expected components", function()
-        local expected = { 'animation', 'complex', 'hitbox', 'identity', 'position' }
-        local result = table_keys( entity.components )
-        table.sort( result )
-        assert.is_same( expected, result )
-      end)
-
-      it( "has its own copies of the components", function()
-        assert.is_not_equal( EM.component_templates.position, entity.position )
-        assert.is_not_equal( EM.component_templates.identity, entity.identity )
-        assert.is_not_equal( EM.entity_templates.person.position, entity.position )
-        assert.is_not_equal( EM.component_templates.animation.frames, entity.animation.frames )
-        assert.is_not_equal( EM.entity_templates.person.animation.frames, entity.animation.frames )
-      end)
-
-      it( "has values from the component template", function()
-        assert.is_equal( 'Smith', entity.identity.last_name )
-        assert.is_equal( 12, entity.position.y )
-      end)
-
-      it( "has values from the entity template", function()
-        assert.is_equal( 9, entity.complex.nested.tables.are.difficult.values[ 6 ] )
-        assert.is_equal( 'circle', entity.hitbox.shape )
-      end)
-
-      it( "overrides strings", function()
-        assert.is_equal( 'Susan', entity.identity.first_name )
-      end)
-
-      it( "overrides numbers", function()
-        assert.is_equal( -4, entity.position.x )
-      end)
-
-      it( "overrides boolean values", function()
-        assert.is_equal( false, entity.animation.is_loop )
-      end)
-
-      it( "has the expected tags", function()
-        local entity_tags = table_keys( entity.tags )
-        table.sort( entity_tags )
-        local expected = { 'awesome', 'person', 'susan' }
-        assert.is_same( expected, entity_tags )
+        it( "has the expected tags", function()
+          local entity_tags = table_keys( entity.tags )
+          table.sort( entity_tags )
+          local expected = { 'awesome', 'heroic', 'person' }
+          assert.is_same( expected, entity_tags )
+        end)
       end)
     end)
 
