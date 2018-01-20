@@ -70,18 +70,15 @@ function EntityManager:createEntity( template_name, component_overrides, tags )
       -- first, copy the component defaults onto our new entity
       self:addComponentsToEntity( entity, entity_template )
 
-      -- now layer on the instance-specific overrides.
-      self:addComponentsToEntity( entity, component_overrides )
-
       -- tag it with the template used, since that's the most common use for tags.
       self:addTagToEntity( entity, template_name )
     else -- specified a template, but can't find it
       error( "unknown entity template '" .. template_name .. "'" )
     end
-  else
-    -- no template, just use the component defaults as well as the instance-specific overrides
-    self:addComponentsToEntity( entity, component_overrides )
   end
+
+  -- now layer on the instance-specific overrides.
+  self:addComponentsToEntity( entity, component_overrides )
 
   -- add entity to all of the relevant tag lists/indexes
   if ( tags and #tags > 0 ) then
