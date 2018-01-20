@@ -63,21 +63,23 @@ function EntityManager:createEntity( template_name, component_overrides, tags )
   self.entities[ entity.id ] = entity
 
   -- fetch the component overrides from the given entity template.
-  if template_name and self.entity_templates[ template_name ] then
-    local entity_template = self.entity_templates[ template_name ]
+  if template_name then
+    if self.entity_templates[ template_name ] then
+      local entity_template = self.entity_templates[ template_name ]
 
-    for component_name, template_overrides in pairs( entity_template ) do
-      -- first, copy the component defaults onto our new entity
-      -- use template overrides right away
-      self:addComponentToEntity( entity, component_name, template_overrides )
+      for component_name, template_overrides in pairs( entity_template ) do
+        -- first, copy the component defaults onto our new entity
+        -- use template overrides right away
+        self:addComponentToEntity( entity, component_name, template_overrides )
+      end
+      -- now layer on the instance-specific overrides.
+      self:updateEntityComponents( entity, component_overrides )
+
+      -- tag it with the template used, since that's the most common use for tags.
+      self:addTagToEntity( entity, template_name )
+    else -- specified a template, but can't find it
+      error( "unknown entity template '" .. template_name .. "'" )
     end
-    -- now layer on the instance-specific overrides.
-    self:updateEntityComponents( entity, component_overrides )
-
-    -- tag it with the template used, since that's the most common use for tags.
-    self:addTagToEntity( entity, template_name )
-  elseif template_name then -- specified a template, but can't find it
-    error( "unknown entity template '" .. template_name .. "'" )
   else
     -- no template, just use the component defaults as well as the instance-specific overrides
     self:addComponentsToEntity( entity, component_overrides )
