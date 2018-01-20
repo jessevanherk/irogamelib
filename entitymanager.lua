@@ -71,7 +71,7 @@ function EntityManager:createEntity( template_name, component_overrides, tags )
       self:addComponentsToEntity( entity, entity_template )
 
       -- now layer on the instance-specific overrides.
-      self:updateEntityComponents( entity, component_overrides )
+      self:addComponentsToEntity( entity, component_overrides )
 
       -- tag it with the template used, since that's the most common use for tags.
       self:addTagToEntity( entity, template_name )
@@ -96,6 +96,9 @@ function EntityManager:createEntity( template_name, component_overrides, tags )
   return entity
 end
 
+function EntityManager:addOverridesToEntity( entity, overrides )
+end
+
 function EntityManager:updateEntityComponents( entity, components )
   if ( components ) then
     for component_name, overrides in pairs( components ) do
@@ -109,7 +112,6 @@ function EntityManager:updateEntityComponent( entity, component_name, overrides 
     error( "entity id " .. entity.id .. " does not have component '" .. component_name .. "'" )
   end
 
-  -- keep it simple.
   for key, override in pairs( overrides ) do
     if ( type( override ) ~= 'table' ) then
       -- easy, just copy it over directly.
@@ -190,27 +192,31 @@ end
 -- addComponentToEntity( entity, component_name, overrides )
 --  add a single component to an entity
 function EntityManager:addComponentToEntity( entity, component_name, overrides )
-  -- ensure the component is tracked on the entity itself.
-  entity.components[ component_name ] = true
+  if not self.component_templates[ component_name ] then
+    error( "unknown component '" .. component_name .. "'" )
+  end
 
-  if self.component_templates[ component_name ] ~= nil then
+  if not entity.components[ component_name ] then -- it's not on the entity yet
+    -- ensure the component is tracked on the entity itself.
+    entity.components[ component_name ] = true
+
+    -- add this entity to the index so we can quickly find it
+    -- first make sure we've got an index for this component name
+    if self.componented_entities[ component_name ] == nil then
+      self.componented_entities[ component_name ] = {}
+    end
+    -- add this entity id to the index for this component.
+    self.componented_entities[ component_name ][ entity.id ] = entity
+
     -- deep-copy the component template onto the entity
     -- override with any values that were passed in.
-    -- these may be coming from the entity template.
     local component_template = self.component_templates[ component_name ]
     entity[ component_name ] = deepmerge( component_template, overrides )
-  else
-    -- this is only an informative message.
-    print( "addComponentToEntity: unknown component '" .. component_name .. "'. Check for typos?" )
+  else -- already on the entity
+    -- override with any values that were passed in.
+    local component_data = entity[ component_name ]
+    entity[ component_name ] = deepmerge( component_data, overrides )
   end
-
-  -- add this entity to the index so we can quickly find it
-  -- first make sure we've got an index for this component name
-  if self.componented_entities[ component_name ] == nil then
-    self.componented_entities[ component_name ] = {}
-  end
-  -- add this entity id to the index for this component.
-  self.componented_entities[ component_name ][ entity.id ] = entity
 end
 
 -- removeAllComponentsFromEntity( entity )

@@ -267,20 +267,25 @@ describe( "EntityManager", function()
           assert.is_same( expected, entity_tags )
         end)
 
-        context( "when the override is for a component not on the entity template", function()
+        context( "when the override is for a component isn't on the entity template", function()
           context( "when the component template exists", function()
             local good_overrides = { identity = { first_name = "Rocky" } }
 
+            it( "adds the component", function()
+              local entity = EM:createEntity( 'person', good_overrides, tags )
+
+              assert.is.equal( true, entity.components.identity )
+              assert.is_equal( "Smith", entity.identity.last_name )
+            end)
+
+            it( "uses the component override values", function()
+              local entity = EM:createEntity( 'person', good_overrides, tags )
+
+              assert.is_equal( "Rocky", entity.identity.first_name )
+            end)
+
             it( "doesn't throw an error", function()
               assert.has_no_error( function() EM:createEntity( "rock", good_overrides, tags ) end )
-            end)
-
-            it( "adds the component", function()
-              assert.is.equal(false, true)
-            end)
-
-            it( "uses the component overrides", function()
-              assert.is.equal(false, true)
             end)
           end)
 
@@ -288,7 +293,7 @@ describe( "EntityManager", function()
             local bad_overrides = { ice_cream = { flavour = "Rocky Road" } }
 
             it( "throws an error", function()
-              local expected = "foobar"
+              local expected = "unknown component 'ice_cream'"
               assert.has_error( function() EM:createEntity( "rock", bad_overrides, tags ) end, expected )
             end)
           end)
