@@ -67,11 +67,9 @@ function EntityManager:createEntity( template_name, component_overrides, tags )
     if self.entity_templates[ template_name ] then
       local entity_template = self.entity_templates[ template_name ]
 
-      for component_name, template_overrides in pairs( entity_template ) do
-        -- first, copy the component defaults onto our new entity
-        -- use template overrides right away
-        self:addComponentToEntity( entity, component_name, template_overrides )
-      end
+      -- first, copy the component defaults onto our new entity
+      self:addComponentsToEntity( entity, entity_template )
+
       -- now layer on the instance-specific overrides.
       self:updateEntityComponents( entity, component_overrides )
 
