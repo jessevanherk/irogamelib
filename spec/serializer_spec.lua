@@ -3,7 +3,7 @@ local Serializer = require( 'serializer' )
 describe( "serializer", function()
   serializer = Serializer:new()
 
-  describe( "getAsFile", function()
+  describe( "#getAsFile", function()
     context( "when input is empty", function()
       local input = {}
 
@@ -27,7 +27,7 @@ describe( "serializer", function()
     end)
   end)
 
-  describe( "getstring", function()
+  describe( "#getstring", function()
     context( "when input is nil", function()
       local input = nil
 

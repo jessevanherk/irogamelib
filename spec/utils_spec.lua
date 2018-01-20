@@ -4,7 +4,7 @@
 require( 'utils' )
 
 describe( "Utils", function()
-  describe( "rgb()", function()
+  describe( "#rgb", function()
     context( "when input is too large", function()
       local input = 0x1000000
 
@@ -35,7 +35,7 @@ describe( "Utils", function()
     end)
   end)
 
-  describe( "rgba()", function()
+  describe( "#rgba", function()
     context( "when value is 0", function()
       local input = 0
       local result = rgba( input )
@@ -77,7 +77,7 @@ describe( "Utils", function()
     end)
   end)
 
-  describe( "deepcopy()", function()
+  describe( "#deepcopy", function()
     context( "when value is nil", function()
       local input = nil
       local result = deepcopy( input )
@@ -165,7 +165,7 @@ describe( "Utils", function()
     end)
   end)
 
-  describe( "deepmerge()", function()
+  describe( "#deepmerge", function()
     context( "when overrides is nil", function()
       local overrides = nil
       local target = { a = 'foo' }
@@ -246,7 +246,7 @@ describe( "Utils", function()
     end)
   end)
 
-  describe( "table_keys()", function()
+  describe( "#table_keys", function()
     context( "when input is empty", function()
       local input = {}
       local result = table_keys( input )

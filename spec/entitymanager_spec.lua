@@ -68,7 +68,7 @@ local entity_templates = {
 }
 
 describe( "EntityManager", function()
-  describe( "new()", function()
+  describe( "#new", function()
     context( "When no templates provided", function()
       local EM = EntityManager:new()
 
@@ -104,7 +104,7 @@ describe( "EntityManager", function()
     end)
   end)
 
-  describe( "createEntity()", function()
+  describe( "#createEntity", function()
     local EM = EntityManager:new( entity_templates, component_templates )
 
     context( "when no arguments provided", function()
@@ -302,7 +302,7 @@ describe( "EntityManager", function()
     end)
   end)
 
-  describe( "getEntityWithTag()", function()
+  describe( "#getEntityWithTag", function()
     local EM = EntityManager:new( entity_templates, component_templates )
     EM:createEntity( 'rock' )
     local e1 = EM:createEntity( nil, nil, { 'foo', 'bar' } )
@@ -330,7 +330,7 @@ describe( "EntityManager", function()
     end)
   end)
 
-  describe( "getEntitiesWithTag()", function()
+  describe( "#getEntitiesWithTag", function()
     local EM = EntityManager:new( entity_templates, component_templates )
     EM:createEntity( 'rock' )
     local e1 = EM:createEntity( nil, nil, { 'foo', 'bar' } )
@@ -363,7 +363,7 @@ describe( "EntityManager", function()
     end)
   end)
 
-  describe( "addTagsToEntity()", function()
+  describe( "#addTagsToEntity", function()
     local EM = EntityManager:new( entity_templates, component_templates )
 
     context( "when tags is nil", function()
@@ -422,7 +422,7 @@ describe( "EntityManager", function()
     end)
   end)
 
-  describe( "removeTagFromEntity()", function()
+  describe( "#removeTagFromEntity", function()
     local EM = EntityManager:new( entity_templates, component_templates )
 
     context( "when tags is nil", function()
@@ -473,7 +473,7 @@ describe( "EntityManager", function()
     end)
   end)
 
-  describe( "removeTagsFromEntity()", function()
+  describe( "#removeTagsFromEntity", function()
     local EM = EntityManager:new( entity_templates, component_templates )
     local e1 = EM:createEntity( 'person', nil, { 'tag1', 'tag2', 'tag3' } )
 
@@ -515,7 +515,7 @@ describe( "EntityManager", function()
     end)
   end)
 
-  describe( "deleteEntity()", function()
+  describe( "#deleteEntity", function()
     local EM = EntityManager:new( entity_templates, component_templates )
     local e1 = EM:createEntity( 'person' )
     local e2 = EM:createEntity( 'person' )
@@ -551,7 +551,7 @@ describe( "EntityManager", function()
     end)
   end)
 
-  describe( "reapEntities()", function()
+  describe( "#reapEntities", function()
     local EM = EntityManager:new( entity_templates, component_templates )
     local e1 = EM:createEntity( 'person', nil, { 'deleter' } )
     local e2 = EM:createEntity( 'person', nil, { 'keeper' } )
@@ -579,7 +579,7 @@ describe( "EntityManager", function()
     end)
   end)
 
-  describe( "deleteAllEntities()", function()
+  describe( "#deleteAllEntities", function()
     context( "when there are no entities", function()
       local EM = EntityManager:new( entity_templates, component_templates )
       EM:deleteAllEntities()
@@ -639,7 +639,7 @@ describe( "EntityManager", function()
     end)
   end)
 
-  describe( "getEntityData()", function()
+  describe( "#getEntityData", function()
     local EM = EntityManager:new( entity_templates, component_templates )
 
     context( "when entity is nil", function()
@@ -674,7 +674,7 @@ describe( "EntityManager", function()
     end)
   end)
 
-  describe( "getAllEntitiesData()", function()
+  describe( "#getAllEntitiesData", function()
     local EM = EntityManager:new( entity_templates, component_templates )
 
     context( "when no entities", function()

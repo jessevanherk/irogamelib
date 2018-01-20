@@ -3,7 +3,7 @@ local Console = require( 'console' )
 describe( "console", function()
   console = Console:new()
 
-  describe( "wrap", function()
+  describe( "#wrap", function()
     context( "when given a nil", function()
       local input = nil
       local result = console:wrap( input )
@@ -106,7 +106,7 @@ describe( "console", function()
     end)
   end)
 
-  describe ":eval" do
+  describe "#eval" do
     context( "when input can't be compiled", function()
       local input = "("
       local result = console:eval( input )
