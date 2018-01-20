@@ -140,35 +140,44 @@ describe( "EntityManager", function()
       end)
 
       context( "when only entity template provided", function()
-        local entity = EM:createEntity( 'person', nil, tags )
+        context( "when template exists", function()
+          local entity = EM:createEntity( 'person', nil, tags )
 
-        it( "has the components from the template", function()
-          local expected = { 'animation', 'complex', 'hitbox', 'identity', 'position' }
-          local result = table_keys( entity.components )
-          table.sort( result )
-          assert.is_same( expected, result )
+          it( "has the components from the template", function()
+            local expected = { 'animation', 'complex', 'hitbox', 'identity', 'position' }
+            local result = table_keys( entity.components )
+            table.sort( result )
+            assert.is_same( expected, result )
+          end)
+
+          it( "has its own copies of the components", function()
+            assert.is_not_equal( EM.component_templates.position, entity.position )
+            assert.is_not_equal( EM.entity_templates.person.position, entity.position )
+            assert.is_not_equal( EM.component_templates.animation.frames, entity.animation.frames )
+            assert.is_not_equal( EM.entity_templates.person.animation.frames, entity.animation.frames )
+          end)
+
+          it( "has the values from the entity template", function()
+            local expected = { x = 42, y = 12, angle = 0 }
+            assert.is_same( expected, entity.position )
+            assert.is_equal( 4, entity.complex.nested.tables.are.difficult.values[ 3 ] )
+          end)
+
+          it( "is auto-tagged with the template name", function()
+            assert.is_true( entity.tags.person )
+          end)
+
+          it( "has the specified tags", function()
+            assert.is_true( entity.tags.awesome )
+            assert.is_true( entity.tags.heroic )
+          end)
         end)
 
-        it( "has its own copies of the components", function()
-          assert.is_not_equal( EM.component_templates.position, entity.position )
-          assert.is_not_equal( EM.entity_templates.person.position, entity.position )
-          assert.is_not_equal( EM.component_templates.animation.frames, entity.animation.frames )
-          assert.is_not_equal( EM.entity_templates.person.animation.frames, entity.animation.frames )
-        end)
-
-        it( "has the values from the entity template", function()
-          local expected = { x = 42, y = 12, angle = 0 }
-          assert.is_same( expected, entity.position )
-          assert.is_equal( 4, entity.complex.nested.tables.are.difficult.values[ 3 ] )
-        end)
-
-        it( "is auto-tagged with the template name", function()
-          assert.is_true( entity.tags.person )
-        end)
-
-        it( "has the specified tags", function()
-          assert.is_true( entity.tags.awesome )
-          assert.is_true( entity.tags.heroic )
+        context( "when template doesn't exist", function()
+          it( "throws an error", function()
+            expected = "unknown entity template 'some_unknown_template'"
+            assert.has_error( function() EM:createEntity( "some_unknown_template" ) end, expected )
+          end)
         end)
       end)
 
