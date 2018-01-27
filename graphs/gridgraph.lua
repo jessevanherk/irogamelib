@@ -10,10 +10,15 @@ function GridGraph:new( ... )
     return instance
 end
 
-function GridGraph:_init( width, height, values )
+function GridGraph:_init( width, height, values, cost_cb )
     self.width  = width
     self.height = height
     self.values = {}
+
+    self.cost_cb = self.default_cost_cb
+    if cost_cb then
+      self.cost_cb = cost_cb
+    end
 
     for j = 1, height do
         self.values[ j ] = {}
@@ -59,16 +64,12 @@ end
 
 -- get cost to move from current node to target node
 function GridGraph:getCost( current, target )
-    -- for now, all movement costs are 1.
-    local cost = 1
+  local current_value = self:get( current )
+  local target_value  = self:get( target )
 
-    local x = current[ 1 ]
-    local y = current[ 2 ]
-    if self.values[ y ] and self.values[ y ][ x ] and self.values[ y ][ x ].terrain == '~' then
-        cost = 20
-    end
+  local cost = self.cost_cb( current_value, target_value )
 
-    return cost
+  return cost
 end
 
 -- return a list of neighbour positions in no particular order
@@ -108,6 +109,12 @@ function GridGraph:getNeighbourValues( point )
     end
 
     return values
+end
+
+-- by default, movement costs are all 1.
+-- this can/should be overloaded.
+function GridGraph.default_cost_cb( current_value, target_value )
+  return 1
 end
 
 return GridGraph
