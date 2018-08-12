@@ -1,9 +1,10 @@
--- implementation of behaviour trees for AI, using coroutines. 
+-- implementation of behaviour trees for AI, using coroutines.
 -- a behaviour tree object is initialized with a nested list
 -- of nodes.
--- Each node is a pair: a string represnting the node type, and:
--- a single node, for decorators
--- a list of node, for sequences/etc
+-- Each node is a pair:
+--    node_type: a string representing the node type
+--    node_args: a single node, for decorators
+--               a list of node, for sequences/etc
 -- tasks are the leaf nodes, and take the task name as a string
 
 BehaviourTree = {}
@@ -17,12 +18,14 @@ function BehaviourTree:new( ... )
   return instance
 end
 
--- create a new behaviour tree.
--- this doesn't do any tick
--- context is a table/object contaiming whatever other data/methods
--- are needed by your tasks. Could be your space/world.
--- blackboard is a table/object used to store data specific to
--- this tree. Could be your entity object.
+-- create a new behaviour tree, but doesn't tick it.
+-- tree_root: nested table representing the tree to build
+-- context:
+--     a table/object containing whatever other data & methods
+--     are needed by your tasks. Could be your space/world.
+-- blackboard:
+--     a table/object used to store data specific to this tree.
+--     Could be the associated entity object.
 function BehaviourTree:_init( tree_root, available_tasks, context, blackboard )
   self.tasks = available_tasks
   self.context = context
@@ -34,8 +37,8 @@ function BehaviourTree:_init( tree_root, available_tasks, context, blackboard )
   self.co = self:createCoroutine( tree_root )
 end
 
+-- create the coroutine for the behaviour
 function BehaviourTree:createCoroutine( tree_root )
-  -- create the coroutine for the behaviour
   local co = coroutine.create(
     function()
       return self:runNode( tree_root )
@@ -44,7 +47,7 @@ function BehaviourTree:createCoroutine( tree_root )
   return co
 end
 
--- advance the behaviour tree coroutine
+-- advance the behaviour tree coroutine until something yields.
 function BehaviourTree:tick( dt )
   local is_done = false
   local success, result = coroutine.resume( self.co, dt )
@@ -62,7 +65,10 @@ end
 function BehaviourTree:runNode( node )
   -- make sure we only have one child node
   assert( type( node ) == "table", "node must be a table" )
-  assert( type( node[ 1 ] ) == "string", "invalid node format - must be {string, argument}. Got { " .. tostring( node[ 1 ] ) .. ", " .. tostring( node[ 2 ] ) .. " }" )
+  assert( type( node[ 1 ] ) == "string",
+      "invalid node format - must be {string, argument}. Got { "
+      .. tostring( node[ 1 ] ) .. ", " .. tostring( node[ 2 ] ) .. " }"
+    )
 
   -- get the current node type and args
   local node_type, arguments = unpack( node )
@@ -76,15 +82,14 @@ function BehaviourTree:runNode( node )
 end
 
 -- run a single task (leaf node)
--- this should return true or false
--- or yield to indicate "running"
+-- the task function should return true, false, or yield to indicate "running"
 function BehaviourTree:task( task_name )
   -- look up the task by name
   task_fn = self.tasks[ task_name ]
   assert( task_fn, "unknown task name '" .. tostring(task_name) .. "'" )
 
   -- actually run the task.
-  -- nil result is treated as success.
+  -- nil result is also treated as success, for when task doesn't explicitly return.
   local result = task_fn( self.blackboard, self.context )
   if result ~= nil and result == false then
     return false
@@ -102,12 +107,11 @@ function BehaviourTree:sequence( child_nodes )
       return false
     end
   end
-  
+
   return true
 end
 
 -- this should only ever be the root node
--- FIXME: detect spinloops and error out
 function BehaviourTree:repeatSequence( child_nodes )
   while true do
     self:sequence( child_nodes )
@@ -116,8 +120,6 @@ function BehaviourTree:repeatSequence( child_nodes )
     -- avoid spinloop by yielding out
     coroutine.yield()
   end
-  
-  return true
 end
 
 -- run child nodes until one succeeded
@@ -136,12 +138,12 @@ end
 -- decorators
 
 function BehaviourTree:succeed( child )
-  local result = self:runNode( child )
+  self:runNode( child )
   return true
 end
 
 function BehaviourTree:fail( child )
-  local result = self:runNode( child )
+  self:runNode( child )
   return false
 end
 
