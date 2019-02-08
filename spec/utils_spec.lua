@@ -247,13 +247,9 @@ describe( "Utils", function()
   end)
 
   describe( "#spairs", function()
-    context( "when sort function not given", function()
-      local input = {
-        b = 31,
-        a = 35,
-        d = 42,
-      }
+    local input = { b = 31, a = 35, d = 42 }
 
+    context( "when sort function not given", function()
       it( "sorts by table key", function()
         local result = {}
         for key, _ in spairs( input ) do
@@ -264,12 +260,6 @@ describe( "Utils", function()
     end)
 
     context( "when sort function is provided", function()
-      local input = {
-        b = 31,
-        a = 35,
-        d = 42,
-      }
-
       it( "sorts using that function", function()
         local reverse_sort_cb = function( _, a, b ) return b < a end
 
