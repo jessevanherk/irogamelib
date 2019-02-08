@@ -246,6 +246,42 @@ describe( "Utils", function()
     end)
   end)
 
+  describe( "#spairs", function()
+    context( "when sort function not given", function()
+      local input = {
+        b = 31,
+        a = 35,
+        d = 42,
+      }
+
+      it( "sorts by table key", function()
+        local result = {}
+        for key, _ in spairs( input ) do
+          table.insert( result, key )
+        end
+        assert.is_same( { "a", "b", "d" }, result )
+      end)
+    end)
+
+    context( "when sort function is provided", function()
+      local input = {
+        b = 31,
+        a = 35,
+        d = 42,
+      }
+
+      it( "sorts using that function", function()
+        local reverse_sort_cb = function( _, a, b ) return b < a end
+
+        local result = {}
+        for key, _ in spairs( input, reverse_sort_cb ) do
+          table.insert( result, key )
+        end
+        assert.is_same( { "d", "b", "a" }, result )
+      end)
+    end)
+  end)
+
   describe( "#table_keys", function()
     context( "when input is empty", function()
       local input = {}

@@ -132,7 +132,7 @@ function spairs( t, order_cb )
 
   -- if order function given, sort by it by passing the table and keys a, b,
   -- otherwise just sort the keys
-  if order then
+  if order_cb then
     table.sort( keys, function( a, b ) return order_cb( t, a, b ) end )
   else
     table.sort( keys )
