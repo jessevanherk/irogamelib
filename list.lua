@@ -129,11 +129,19 @@ function List:peekLast()
   return self[ last ]
 end
 
-
 function List:unshift( value )
   local first = self.first - 1
   self.first = first
   self[ first ] = value
+end
+
+function List:entries()
+  local entries = {}
+  for i = self.first, self.last do
+    table.insert( entries, #entries + 1, self[ i ] )
+  end
+
+  return entries
 end
 
 return List
