@@ -91,6 +91,10 @@ function Space:findFirst( query )
   return entity
 end
 
+function Space:createEntity( template_name, overrides, tags )
+  return self.entity_manager:createEntity( template_name, overrides, tags )
+end
+
 -- register signal handlers. called from various systems
 -- return a set of handles that can be used to unregister them later
 function Space:registerSignalHandlers( signal_actions )
