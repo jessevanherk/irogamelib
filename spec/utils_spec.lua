@@ -16,21 +16,53 @@ describe( "Utils", function()
 
     context( "when value is 0", function()
       local input = 0
-      local result = rgb( input )
 
       it("returns a zero list", function()
         local expected = { 0, 0, 0 }
+        local result = rgb( input )
         assert.are.same( expected, result )
       end)
     end)
 
     context( "when value is in-range", function()
       local input = 0xaabbcc
-      local result = rgb( input )
 
       it("returns the expected values", function()
-        local expected = { 0xaa, 0xbb, 0xcc }
+        local expected = { 0xaa / 255.0, 0xbb / 255.0, 0xcc / 255.0 }
+        local result = rgb( input )
         assert.are.same( expected, result )
+      end)
+    end)
+
+    context( "for well-known colors", function()
+      context( "when given red", function()
+        local input = 0xff0000
+
+        it( "returns 1,0,0", function()
+          local expected = { 1.0, 0, 0 }
+          local result = rgb( input )
+          assert.are.same( expected, result )
+        end)
+      end)
+
+      context( "when given green", function()
+        local input = 0x00ff00
+
+        it( "returns 0,1,0", function()
+          local expected = { 0, 1.0, 0 }
+          local result = rgb( input )
+          assert.are.same( expected, result )
+        end)
+      end)
+
+      context( "when given blue", function()
+        local input = 0x0000ff
+
+        it( "returns 0,1,0", function()
+          local expected = { 0, 0, 1.0 }
+          local result = rgb( input )
+          assert.are.same( expected, result )
+        end)
       end)
     end)
   end)
@@ -38,40 +70,40 @@ describe( "Utils", function()
   describe( "#rgba", function()
     context( "when value is 0", function()
       local input = 0
-      local result = rgba( input )
 
       it("returns a zero list", function()
         local expected = { 0, 0, 0, 0 }
+        local result = rgba( input )
         assert.are.same( expected, result )
       end)
     end)
 
     context( "when opacity is zero", function()
       local input = 0xaabbcc00
-      local result = rgba( input )
 
       it("returns the expected colours and opacity", function()
-        local expected = { 0xaa, 0xbb, 0xcc, 0x00 }
+        local expected = { 0xaa / 255.0, 0xbb / 255.0, 0xcc / 255.0, 0 }
+        local result = rgba( input )
         assert.are.same( expected, result )
       end)
     end)
 
     context( "when opacity is full", function()
       local input = 0xaabbccff
-      local result = rgba( input )
 
       it("returns the expected colours and opacity", function()
-        local expected = { 0xaa, 0xbb, 0xcc, 0xff }
+        local expected = { 0xaa / 255.0, 0xbb / 255.0, 0xcc / 255.0, 1.0 }
+        local result = rgba( input )
         assert.are.same( expected, result )
       end)
     end)
 
     context( "When high bits are zero", function()
       local input = 0x00aabbcc
-      local result = rgba( input )
 
       it("returns the expected colours and opacity", function()
-        local expected = { 0x00, 0xaa, 0xbb, 0xcc }
+        local expected = { 0, 0xaa / 255.0, 0xbb / 255.0, 0xcc / 255.0 }
+        local result = rgba( input )
         assert.are.same( expected, result )
       end)
     end)

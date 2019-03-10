@@ -11,7 +11,7 @@ function rgb( colour )
   r = math.floor(   colour / 65536 )
   g = math.floor( ( colour % 65536 ) / 256 )
   b = colour % 256
-  return { r, g, b }
+  return { r / 255.0, g / 255.0, b / 255.0 }
 end
 
 -- same as rgb(), but 2 extra bytes at the end for alpha.
@@ -22,7 +22,7 @@ function rgba( colour )
   a = colour % 256
   top_bytes = math.floor( colour / 256 )
   r, g, b = unpack( rgb( top_bytes ) )
-  return { r, g, b, a }
+  return { r, g, b, a / 255.0 }
 end
 
 -- perform a full deep copy on the given table
