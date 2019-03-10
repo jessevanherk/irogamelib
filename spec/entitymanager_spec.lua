@@ -335,16 +335,15 @@ describe( "EntityManager", function()
     local e1 = EM:createEntity( nil, nil, { 'foo', 'bar' } )
 
     context( "when no matching tagged entities", function()
-      local result = EM:getEntityWithTag( 'wuzzle' )
-
       it( "returns nil", function()
+        local result = EM:getEntityWithTag( 'wuzzle' )
         assert.is_nil( result )
       end)
     end)
 
     context( "when only one tagged entity", function()
-      local result = EM:getEntityWithTag( 'foo' )
       it( "returns the tagged entity", function()
+        local result = EM:getEntityWithTag( 'foo' )
         assert.is_same( e1, result )
       end)
     end)
@@ -364,27 +363,26 @@ describe( "EntityManager", function()
     local e2 = EM:createEntity( nil, nil, { 'bar' } )
 
     context( "when no matching tagged entities", function()
-      local results = EM:getEntitiesWithTag( 'wuzzle' )
-
       it( "returns an empty list", function()
+        local results = EM:getEntitiesWithTag( 'wuzzle' )
         assert.is_same( {}, results )
       end)
     end)
 
     context( "when only one tagged entity", function()
-      local results = EM:getEntitiesWithTag( 'foo' )
-
       it( "returns a single item list", function()
         local expected = { e1 }
+
+        local results = EM:getEntitiesWithTag( 'foo' )
         assert.is_same( expected, results )
       end)
     end)
 
     context( "when multiple entities tagged", function()
-      local results = EM:getEntitiesWithTag( 'bar' )
-
       it( "returns all matching entities", function()
         local expected = { e1, e2 }
+
+        local results = EM:getEntitiesWithTag( 'bar' )
         assert.is_same( expected, results )
       end)
     end)
@@ -705,36 +703,36 @@ describe( "EntityManager", function()
     local EM = EntityManager:new( entity_templates, component_templates )
 
     context( "when no entities", function()
-      local results = EM:getAllEntitiesData()
-
       it( "returns an empty list", function()
+        local results = EM:getAllEntitiesData()
         assert.is_same( {}, results )
       end)
     end)
 
     context( "when one entity present", function()
       local entity = EM:createEntity( 'rock', nil, { 'rocky', 'heroic' } )
-      local results = EM:getAllEntitiesData()
-      local result = results[ 1 ]
-      local id, components, tags = result.id, result.components, result.tags
-      table.sort( tags )
 
       it( "has the expected components", function()
         local expected = {
           position = { x = 10, y = 12, angle = 0 },
           hitbox = { shape = 'triangle', offset = { x = 23, y = 43 } },
         }
-        assert.is_same( expected, components )
+        local result = EM:getAllEntitiesData()[ 1 ]
+        assert.is_same( expected, result.components )
       end)
 
       it( "has the expected tags", function()
         local expected = { 'heroic', 'rock', 'rocky' }
+        local result = EM:getAllEntitiesData()[ 1 ]
+        local tags = result.tags
+        table.sort( tags )
         assert.is_same( expected, tags )
       end)
 
       it( "has the expected id", function()
         local expected = entity.id
-        assert.is_same( expected, id )
+        local result = EM:getAllEntitiesData()[ 1 ]
+        assert.is_same( expected, result.id )
       end)
     end)
   end)

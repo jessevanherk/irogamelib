@@ -14,27 +14,27 @@ describe( "GridGraph", function()
 
   describe( "#new", function()
     context( "when given all params", function()
-      local graph = GridGraph:new( width, height, values, cost_cb )
-
       it( "sets the width and height", function()
+        local graph = GridGraph:new( width, height, values, cost_cb )
         assert.is.same( 2, graph.width )
         assert.is.same( 3, graph.height )
       end)
 
       it( "sets the values", function()
+        local graph = GridGraph:new( width, height, values, cost_cb )
         local expected = { { 'a', '%' }, { 0, 4 }, { 'b', '~' } }
         assert.is.same( expected, graph.values )
       end)
 
       it( "sets the cost callback", function()
+        local graph = GridGraph:new( width, height, values, cost_cb )
         assert.is.same( cost_cb, graph.cost_cb )
       end)
     end)
 
     context( "when cost function is not given", function()
-      local graph = GridGraph:new( width, height, values )
-
       it( "uses the default cost callback", function()
+        local graph = GridGraph:new( width, height, values )
         local expected = graph.default_cost_cb
         assert.is.same( expected, graph.cost_cb )
       end)
