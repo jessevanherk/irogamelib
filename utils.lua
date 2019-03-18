@@ -207,3 +207,20 @@ function getopt( arg, options )
   return tab
 end
 
+-- similar to ruby's hash#dig.
+function dig( object, ... )
+  if not object then
+    return nil
+  end
+
+  local current_val = object
+
+  for _, key in ipairs( { ... } ) do
+    current_val = current_val[ key ]
+    if not current_val then
+      break
+    end
+  end
+
+  return current_val
+end

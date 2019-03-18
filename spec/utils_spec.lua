@@ -351,4 +351,49 @@ describe( "Utils", function()
       end)
     end)
   end)
+
+  describe( "#dig", function()
+    context( "when entity is nil", function()
+      local entity = nil
+
+      it( "returns nil", function()
+        local result = dig( entity, "foo", "bar", "baz" )
+        assert.is_nil( result )
+      end)
+    end)
+
+    context( "when entity is present", function()
+      local entity = { foo = { bar = { baz = "diggy diggy hole" } } }
+
+      context( "when the keys exist", function()
+        it( "returns the expected value", function()
+          local expected = "diggy diggy hole"
+          local result = dig( entity, "foo", "bar", "baz" )
+          assert.is_equal( expected, result )
+        end)
+      end)
+
+      context( "when the last key is nil", function()
+        it( "returns nil", function()
+          local result = dig( entity, "foo", "bar", "nada" )
+          assert.is_nil( result )
+        end)
+
+        it( "doesn't raise an error", function()
+          assert.has_no_error( function() dig( entity, "foo", "bar", "nada" ) end )
+        end)
+      end)
+
+      context( "when one of the parent keys is nil", function()
+        it( "returns nil", function()
+          local result = dig( entity, "foo", "also_nada", "nada" )
+          assert.is_nil( result )
+        end)
+
+        it( "doesn't raise an error", function()
+          assert.has_no_error( function() dig( entity, "foo", "also_nada", "nada" ) end )
+        end)
+      end)
+    end)
+  end)
 end)
