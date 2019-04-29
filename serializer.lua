@@ -1,13 +1,4 @@
-local Serializer = {}
-
--- magic constructor for the system. real init code goes in init().
-function Serializer:new( ... )
-  local instance = {}
-  setmetatable( instance, self )
-  self.__index = self
-  self._init( instance, ... )
-  return instance
-end
+local Serializer = Class()
 
 function Serializer:_init()
   self:clearSeenKeys()

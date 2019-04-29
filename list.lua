@@ -20,16 +20,7 @@ local next_item = Q.pop() -- gets bar
 
 ]]
 
-local List = {}
-
-function List:new( ... )
-  local instance = {}
-  setmetatable( instance, self )
-  self.__index = self
-  self._init( instance, ... )
-
-  return instance
-end
+local List = Class()
 
 function List:_init( ... )
   local arg = { ... }

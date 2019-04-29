@@ -1,5 +1,7 @@
 -- load libraries. these can't all be mocked
 require( "utils" )
+require( "spec.spec_helper" )
+
 Space = require( "space" )
 _G['EntityManager'] = require( "entitymanager" )
 _G['SystemManager'] = require( "systemmanager" )

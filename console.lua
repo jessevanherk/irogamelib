@@ -1,15 +1,7 @@
 -- console module.
 -- author: Jesse van Herk <jesse@imaginaryrobots.net>
 
-local Console = {}
-
-function Console:new( ... )
-  local instance = {}
-  setmetatable( instance, self )
-  self.__index = self
-  self._init( instance, ... )
-  return instance
-end
+local Console = Class()
 
 function Console:_init()
 end

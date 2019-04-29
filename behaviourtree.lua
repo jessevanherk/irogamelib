@@ -7,16 +7,7 @@
 --               a list of node, for sequences/etc
 -- tasks are the leaf nodes, and take the task name as a string
 
-BehaviourTree = {}
-
--- magic constructor for the system. real init code goes in init().
-function BehaviourTree:new( ... )
-  local instance = {}
-  setmetatable( instance, self )
-  self.__index = self
-  self._init( instance, ... )
-  return instance
-end
+local BehaviourTree = Class()
 
 -- create a new behaviour tree, but doesn't tick it.
 -- tree_root: nested table representing the tree to build

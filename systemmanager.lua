@@ -5,15 +5,7 @@
 -- things into sub classes.
 -- should NOT know about rendering engine or systems.
 
-local SystemManager = {}
-
-function SystemManager:new( ... )
-  local instance = {}
-  setmetatable( instance, self )
-  self.__index = self
-  self._init( instance, ... )
-  return instance
-end
+local SystemManager = Class()
 
 function SystemManager:_init( systems, system_prefix, space )
   self.system_prefix = system_prefix or "systems."

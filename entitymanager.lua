@@ -4,16 +4,7 @@
 -- returning resultsets, NOT objects.
 -- operations on entity data should be done by systems
 
-local EntityManager = {}
-
--- magic constructor for the system. real init code goes in init().
-function EntityManager:new( ... )
-  local instance = {}
-  setmetatable( instance, self )
-  self.__index = self
-  self._init( instance, ... )
-  return instance
-end
+local EntityManager = Class()
 
 -- entity_templates are named tables so we can quickly create new entities then override as needed.
 -- component_templates are named tables, basically the default values for each component.

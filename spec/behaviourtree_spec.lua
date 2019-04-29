@@ -1,5 +1,8 @@
 -- spec script. should NOT be bundled with final game.
 --
+
+require( "spec.spec_helper" )
+
 BehaviourTree = require( "behaviourtree" )
 
 describe( "BehaviourTree", function()

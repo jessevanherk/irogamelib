@@ -1,6 +1,8 @@
 -- spec script. should NOT be bundled with final game.
 -- for lib/list.lua
 --
+require( "spec.spec_helper" )
+
 List = require( 'list' )
 
 describe( "List", function()

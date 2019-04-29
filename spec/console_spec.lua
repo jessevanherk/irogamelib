@@ -1,3 +1,5 @@
+require( "spec.spec_helper" )
+
 local Console = require( 'console' )
 
 describe( "console", function()

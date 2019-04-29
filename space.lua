@@ -4,16 +4,7 @@
 --        This is useful for having multiple loaded levels/scenes and only having one active,
 --        e.g. gameplay versus menus
 
-local Space = {}
-
--- magic constructor for the system. real init code goes in init().
-function Space:new( ... )
-  local instance = {}
-  setmetatable( instance, self )
-  self.__index = self
-  self._init( instance, ... )
-  return instance
-end
+local Space = Class()
 
 -- create new space, pass in component data to use.
 function Space:_init( entity_templates, component_templates, systems, system_prefix )

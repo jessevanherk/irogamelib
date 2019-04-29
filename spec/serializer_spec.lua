@@ -1,3 +1,5 @@
+require( "spec.spec_helper" )
+
 local Serializer = require( 'serializer' )
 
 describe( "serializer", function()

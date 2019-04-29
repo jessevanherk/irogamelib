@@ -3,6 +3,8 @@
 
 -- load libraries. these can't all be mocked
 require( "utils" )
+require( "spec.spec_helper" )
+
 EntityManager = require( "entitymanager" )
 
 -- set up templates to use

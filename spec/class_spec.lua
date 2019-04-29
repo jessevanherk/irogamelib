@@ -1,4 +1,4 @@
-Class = require( "class" )
+require( "spec.spec_helper" )
 
 describe( "Class", function()
   context( "when base class is not specified", function()

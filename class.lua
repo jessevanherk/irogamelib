@@ -1,5 +1,4 @@
 -- basics for single-inheritance classes.
-dbg = require("debugger")
 
 local BaseClass = {}
 BaseClass.__index = BaseClass
@@ -15,11 +14,19 @@ setmetatable( BaseClass, {
     end,
   })
 
+function BaseClass:new( ... )
+  local instance = {}
+  setmetatable( instance, self )
+  self.__index = self
+  self._init( instance, ... )
+  return instance
+end
+
 function BaseClass:_init()
 end
 
 -- a simple function that returns an inheritable class.
-local function Class( base_class )
+function Class( base_class )
   local DerivedClass = {}
   DerivedClass.__index = DerivedClass
 
