@@ -43,15 +43,15 @@ describe( "BehaviourTree", function()
       local new_tree = BehaviourTree:new( tree_root, available_tasks, context, blackboard )
 
       it( "has the expected tasks", function()
-        assert.is.equal( new_tree.tasks, available_tasks )
+        assert.is.equal( available_tasks, new_tree.tasks )
       end)
 
       it( "has a context", function()
-        assert.is.equal( new_tree.context, context )
+        assert.is.equal( context, new_tree.context )
       end)
 
       it( "has a blackboard", function()
-        assert.are.equal( new_tree.blackboard, blackboard )
+        assert.is.equal( blackboard, new_tree.blackboard )
       end)
 
       it( "has a valid coroutine", function()
@@ -172,7 +172,7 @@ describe( "BehaviourTree", function()
 
           it( "returns true", function()
             local result = tree:task( task_name )
-            assert.is.equal( result, true )
+            assert.is.equal( true, result )
           end)
         end)
 
@@ -181,7 +181,7 @@ describe( "BehaviourTree", function()
 
           it( "returns false", function()
             local result = tree:task( task_name )
-            assert.is.equal( result, false )
+            assert.is.equal( false, result )
           end)
         end)
 
@@ -190,7 +190,7 @@ describe( "BehaviourTree", function()
 
           it( "returns true", function()
             local result = tree:task( task_name )
-            assert.is.equal( result, true )
+            assert.is.equal( true, result )
           end)
         end)
 
@@ -200,7 +200,7 @@ describe( "BehaviourTree", function()
           -- in lua, all values other than nil and false are truthy.
           it( "returns true", function()
             local result = tree:task( task_name )
-            assert.is.equal( result, true )
+            assert.is.equal( true, result )
           end)
         end)
 
@@ -209,7 +209,7 @@ describe( "BehaviourTree", function()
 
           it( "returns true", function()
             local result = tree:task( task_name )
-            assert.is.equal( result, true )
+            assert.is.equal( true, result )
           end)
         end)
       end)
@@ -235,7 +235,7 @@ describe( "BehaviourTree", function()
 
       it( "returns true", function()
         local result = tree:sequence( nodes )
-        assert.is.equal( result, true )
+        assert.is.equal( true, result )
       end)
     end)
 
@@ -269,7 +269,7 @@ describe( "BehaviourTree", function()
 
       it( "returns false", function()
         local result = tree:sequence( nodes )
-        assert.is.equal( result, false )
+        assert.is.equal( false, result )
       end)
     end)
   end)
@@ -327,7 +327,7 @@ describe( "BehaviourTree", function()
         local co = coroutine.create( function() tree:repeatSequence( nodes ) end)
         coroutine.resume( co )
 
-        assert.is.equal(coroutine.status( co ), "suspended" )
+        assert.is.equal( "suspended", coroutine.status( co ) )
 
         tree.sequence:revert()
       end)
