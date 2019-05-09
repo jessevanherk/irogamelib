@@ -80,9 +80,14 @@ function BehaviourTree:task( task_name )
   assert( task_fn, "unknown task name '" .. tostring(task_name) .. "'" )
 
   -- actually run the task.
-  -- nil result is also treated as success, for when task doesn't explicitly return.
   local result = task_fn( self.blackboard, self.context )
-  if result ~= nil and result == false then
+
+  -- nil result is treated as success, for when task doesn't explicitly return.
+  if result == nil then
+    return true
+  end
+
+  if result == false then
     return false
   end
 
