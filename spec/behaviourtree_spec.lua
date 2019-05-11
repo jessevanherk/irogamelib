@@ -55,7 +55,7 @@ describe( "BehaviourTree", function()
       end)
 
       it( "has a valid coroutine", function()
-        assert.is.truthy( new_tree.co ~= nil )
+        assert.is.not_nil( new_tree.co )
         assert.is.equal( "suspended", coroutine.status( new_tree.co ) )
       end)
     end)
@@ -86,7 +86,7 @@ describe( "BehaviourTree", function()
         end)
       end)
 
-      context( "when tree does not complete", function()
+      context( "when task yielded", function()
         local nodes = { "yield", {} }
 
         local sleepy_tree = BehaviourTree:new( nodes, test_tasks, {}, {} )
@@ -371,9 +371,9 @@ describe( "BehaviourTree", function()
   end)
 
   describe( "#succeed", function()
-    local child = { "task", "return_nil" }
-
     it( "runs the child", function()
+      local child = { "task", "return_nil" }
+
       stub( tree, "runNode" )
 
       tree:succeed( child )
@@ -402,9 +402,9 @@ describe( "BehaviourTree", function()
   end)
 
   describe( "#fail", function()
-    local child = { "task", "return_false" }
-
     it( "runs the child", function()
+      local child = { "task", "return_false" }
+
       stub( tree, "runNode" )
 
       tree:succeed( child )
@@ -414,21 +414,28 @@ describe( "BehaviourTree", function()
     end)
 
     context( "When the child returns true", function()
+      local child = { "task", "return_true" }
+
       it( "returns false", function()
-        local result = tree:succeed( child )
+        local result = tree:fail( child )
+        assert.is.equal( false, result )
       end)
     end)
 
     context( "When the child returns false", function()
+      local child = { "task", "return_false" }
+
       it( "returns false", function()
+        local result = tree:fail( child )
+        assert.is_equal( false, result )
       end)
     end)
   end)
 
   describe( "#invert", function()
-    local child = { "fake_node", {} }
-
     it( "runs the child", function()
+      local child = { "fake_node", {} }
+
       stub( tree, "runNode" )
 
       tree:succeed( child )
