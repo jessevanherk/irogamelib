@@ -70,8 +70,6 @@ function BehaviourTree:runNode( node )
   return result
 end
 
-end
-
 -- run a single task (leaf node)
 -- the task function should return true, false, or yield to indicate "running"
 function BehaviourTree:task( task_name )
