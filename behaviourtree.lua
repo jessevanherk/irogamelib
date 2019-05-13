@@ -40,36 +40,36 @@ end
 
 -- advance the behaviour tree coroutine until something yields.
 function BehaviourTree:tick( dt )
-  local is_done = false
   local success, result = coroutine.resume( self.co, dt )
   if not success then
     error( result )
   end
 
+  local is_tree_done = false
   if coroutine.status( self.co ) == "dead" then
-    is_done = true
+    is_tree_done = true
   end
 
-  return is_done
+  return is_tree_done
 end
 
 function BehaviourTree:runNode( node )
   -- make sure we only have one child node
   assert( type( node ) == "table", "node must be a table" )
-  assert( type( node[ 1 ] ) == "string",
-      "invalid node format - must be {string, argument}. Got { "
-      .. tostring( node[ 1 ] ) .. ", " .. tostring( node[ 2 ] ) .. " }"
-    )
+  assert( type( node[ 1 ] ) == "string", "invalid node format - must be {node_type, children}" )
 
   -- get the current node type and args
-  local node_type, arguments = unpack( node )
+  local node_type, children = unpack( node )
 
   -- call the appropriate handler method
   local handler = self[ node_type ]
   assert( handler, "unknown node type '" .. node_type .. "'" )
 
   -- return that method's result, either success or failure
-  return handler( self, arguments )
+  local result = handler( self, children )
+  return result
+end
+
 end
 
 -- run a single task (leaf node)
@@ -133,18 +133,18 @@ end
 
 -- decorators
 
-function BehaviourTree:succeed( child )
-  self:runNode( child )
+function BehaviourTree:succeed( children )
+  self:runNode( children[ 1 ] )
   return true
 end
 
-function BehaviourTree:fail( child )
-  self:runNode( child )
+function BehaviourTree:fail( children )
+  self:runNode( children[ 1 ] )
   return false
 end
 
-function BehaviourTree:invert( child )
-  local result = self:runNode( child )
+function BehaviourTree:invert( children )
+  local result = self:runNode( children[ 1 ] )
   return not result
 end
 

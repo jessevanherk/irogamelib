@@ -130,7 +130,7 @@ describe( "BehaviourTree", function()
     context( "when passed multiple nodes", function()
       local nodes = { nil, "not_a_node" }
       it( "throws an error", function()
-        local expected = "invalid node format - must be {string, argument}. Got { nil, not_a_node }"
+        local expected = "invalid node format - must be {node_type, children}"
         assert.has_error( function() tree:runNode( nodes ) end, expected )
       end)
     end)
@@ -241,9 +241,9 @@ describe( "BehaviourTree", function()
 
     context( "when a node fails", function()
       local nodes = {
-        { "succeed", { "noop", {} } },
+        { "succeed", {{ "noop", {} }} },
         { "task", "return_false" },
-        { "invert", { "noop", {} } },
+        { "invert", {{ "noop", {} }} },
       }
 
       it( "runs all of the preceding nodes", function()
@@ -269,7 +269,7 @@ describe( "BehaviourTree", function()
 
       it( "returns false", function()
         local result = tree:sequence( nodes )
-        assert.is.equal( false, result )
+        assert.is_false( result )
       end)
     end)
   end)
@@ -371,93 +371,93 @@ describe( "BehaviourTree", function()
   end)
 
   describe( "#succeed", function()
-    it( "runs the child", function()
-      local child = { "task", "return_nil" }
+    it( "runs the first child", function()
+      local children = {{ "task", "return_nil" }}
 
       stub( tree, "runNode" )
 
-      tree:succeed( child )
-      assert.stub( tree.runNode ).was.called_with( tree, child )
+      tree:succeed( children )
+      assert.stub( tree.runNode ).was.called_with( tree, children[ 1 ] )
 
       tree.runNode:revert()
     end)
 
     context( "When the child returns true", function()
-      local child = { "task", "return_true" }
+      local children = {{ "task", "return_true" }}
 
       it( "returns true", function()
-        local result = tree:succeed( child )
+        local result = tree:succeed( children )
         assert.is.truthy( result )
       end)
     end)
 
     context( "When the child returns false", function()
-      local child = { "task", "return_false" }
+      local children = {{ "task", "return_false" }}
 
       it( "returns true", function()
-        local result = tree:succeed( child )
+        local result = tree:succeed( children )
         assert.is.truthy( result )
       end)
     end)
   end)
 
   describe( "#fail", function()
-    it( "runs the child", function()
-      local child = { "task", "return_false" }
+    it( "runs the first child", function()
+      local children = {{ "task", "return_false" }}
 
       stub( tree, "runNode" )
 
-      tree:succeed( child )
-      assert.stub( tree.runNode ).was.called_with( tree, child )
+      tree:fail( children )
+      assert.stub( tree.runNode ).was.called_with( tree, children[ 1 ] )
 
       tree.runNode:revert()
     end)
 
     context( "When the child returns true", function()
-      local child = { "task", "return_true" }
+      local children = {{ "task", "return_true" }}
 
       it( "returns false", function()
-        local result = tree:fail( child )
+        local result = tree:fail( children )
         assert.is.equal( false, result )
       end)
     end)
 
     context( "When the child returns false", function()
-      local child = { "task", "return_false" }
+      local children = {{ "task", "return_false" }}
 
       it( "returns false", function()
-        local result = tree:fail( child )
+        local result = tree:fail( children )
         assert.is_equal( false, result )
       end)
     end)
   end)
 
   describe( "#invert", function()
-    it( "runs the child", function()
-      local child = { "fake_node", {} }
+    it( "runs the first child", function()
+      local children = {{ "fake_node", {} }}
 
       stub( tree, "runNode" )
 
-      tree:succeed( child )
-      assert.stub( tree.runNode ).was.called_with( tree, child )
+      tree:invert( children )
+      assert.stub( tree.runNode ).was.called_with( tree, children[ 1 ] )
 
       tree.runNode:revert()
     end)
 
     context( "When the child returns true", function()
-      local child = { "task", "return_true" }
+      local children = {{ "task", "return_true" }}
 
       it( "returns false", function()
-        local result = tree:invert( child )
+        local result = tree:invert( children )
         assert.is.falsy( result )
       end)
     end)
 
     context( "When the child returns false", function()
-      local child = { "task", "return_false" }
+      local children = {{ "task", "return_false" }}
 
       it( "returns true", function()
-        local result = tree:invert( child )
+        local result = tree:invert( children )
         assert.is.truthy( result )
       end)
     end)
