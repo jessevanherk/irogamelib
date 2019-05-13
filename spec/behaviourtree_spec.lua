@@ -337,9 +337,9 @@ describe( "BehaviourTree", function()
   describe( "#any", function()
     context( "when a child returns true", function()
       local nodes = {
-        { "fail", { "noop", {} } },
+        { "fail", {{ "noop", {} }} },
         { "task", "return_true" },
-        { "invert", { "noop", {} } },
+        { "invert", {{ "noop", {} }} },
       }
 
       it( "runs all of the preceding nodes", function()
