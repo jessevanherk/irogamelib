@@ -72,12 +72,14 @@ describe( "BehaviourTree", function()
                 { "task", "do_yield" },
                 { "task", "update_value" },
                 { "task", "clear_value" },
-              }},
+              }
+            },
             { "sequence", {
                 { "task", "return_true" },
                 { "task", "do_yield" },
                 { "task", "return_true" },
-              }},
+              }
+            },
           },
       }
       local context = {}

@@ -92,9 +92,23 @@ function BehaviourTree:task( task_name )
   return true
 end
 
+function BehaviourTree:getPendingNodes( nodes )
+  local pending_nodes = {}
+
+  for _, node in ipairs( nodes ) do
+    if not node.is_done then
+      pending_nodes[ #pending_nodes + 1 ] = node
+    end
+  end
+
+  return pending_nodes
+end
+
 -- run each node in order, until a failure
 function BehaviourTree:sequence( child_nodes )
-  for _, node in ipairs( child_nodes ) do
+  local pending_nodes = self:getPendingNodes( child_nodes )
+
+  for _, node in ipairs( pending_nodes ) do
     local child_result = self:runNode( node )
     if child_result == false then
       -- stop processing. and return failure
@@ -118,7 +132,9 @@ end
 
 -- run child nodes until one succeeded
 function BehaviourTree:any( child_nodes )
-  for _, node in ipairs( child_nodes ) do
+  local pending_nodes = self:getPendingNodes( child_nodes )
+
+  for _, node in ipairs( pending_nodes ) do
     local child_result = self:runNode( node )
     if child_result == true then
       -- stop processing. and return success
