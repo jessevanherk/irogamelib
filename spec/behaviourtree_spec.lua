@@ -12,6 +12,10 @@ describe( "BehaviourTree", function()
     return_false  = function() return false end,
     return_string = function() return "something" end,
     return_zero   = function() return 0 end,
+    set_value     = function( blackboard ) blackboard.value = "I got set" end,
+    update_value  = function( blackboard ) blackboard.value = "This is better" end,
+    clear_value   = function( blackboard ) blackboard.value = nil end,
+    do_yield      = function() coroutine.yield() end,
   }
   local tree = BehaviourTree:new( {}, test_tasks, {}, {} )
 
@@ -59,6 +63,35 @@ describe( "BehaviourTree", function()
         assert.is.equal( "suspended", coroutine.status( new_tree.co ) )
       end)
     end)
+
+    context( "when behaviour tree was in progress", function()
+      local tree_data = {
+        "sequence", {
+            { "sequence", {
+                { "task", "set_value", is_done = true },
+                { "task", "do_yield" },
+                { "task", "update_value" },
+                { "task", "clear_value" },
+              }},
+            { "sequence", {
+                { "task", "return_true" },
+                { "task", "do_yield" },
+                { "task", "return_true" },
+              }},
+          },
+      }
+      local context = {}
+      local blackboard = { value = "From reloaded data" }
+
+      it( "should not run nodes that are marked as done", function()
+        local resumed_tree = BehaviourTree:new( tree_data, test_tasks, context, blackboard )
+        resumed_tree:tick( 0 )
+
+        assert.is_equal( "From reloaded data", blackboard.value )
+      end)
+      it( "should start at the node marked as running", function()
+      end)
+    end)
   end)
 
   describe( "#tick", function()
@@ -67,7 +100,7 @@ describe( "BehaviourTree", function()
         { "noop", {} },
       }
       local dead_tree = BehaviourTree:new( nodes, test_tasks, {}, {} )
-      coroutine.resume( dead_tree.co )
+      coroutine.resume( dead_tree.co ) -- run it manually, get it to dead.
 
       it( "throws an error", function()
         local expected = "cannot resume dead coroutine"
