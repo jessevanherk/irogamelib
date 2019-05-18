@@ -68,7 +68,11 @@ describe( "BehaviourTree", function()
       local tree_data = {
         "sequence",
         {
-          { "task", "return_false", is_done = true },
+          { "any",
+            {
+              { "task", "set_value", is_done = true },
+            }
+          },
           { "sequence",
             {
               { "task", "set_value", is_done = true },
