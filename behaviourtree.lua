@@ -67,7 +67,28 @@ function BehaviourTree:runNode( node )
 
   -- return that method's result, either success or failure
   local result = handler( self, children )
+
+  -- mark the node as done (after running the children)
+  node.is_done = true
+
   return result
+end
+
+function BehaviourTree:resetNode( node )
+  node.is_done = nil
+
+  local child_nodes = node[ 1 ]
+  if type( child_nodes ) == "table" then
+    for _, child_node in ipairs( child_nodes ) do
+      self:resetNode( child_node )
+    end
+  end
+end
+
+function BehaviourTree:resetNodes( nodes )
+  for _, node in ipairs( nodes ) do
+    self:resetNode( node )
+  end
 end
 
 -- run a single task (leaf node)

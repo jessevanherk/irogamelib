@@ -17,7 +17,6 @@ describe( "BehaviourTree", function()
     clear_value   = function( blackboard ) blackboard.value = nil end,
     do_yield      = function() coroutine.yield() end,
   }
-  local tree = BehaviourTree:new( {}, test_tasks, {}, {} )
 
   describe( "#new", function()
     context( "when no tree data is provided", function()
@@ -144,6 +143,8 @@ describe( "BehaviourTree", function()
   end)
 
   describe( "#runNode", function()
+    local tree = BehaviourTree:new( {}, test_tasks, {}, {} )
+
     context( "when node is valid", function()
       local node = { "task", "return_false" }
 
@@ -179,7 +180,63 @@ describe( "BehaviourTree", function()
     end)
   end)
 
+  describe( "#resetNodes", function()
+    local tree_data = {
+      "sequence",
+      {
+        { "any",
+          {
+            { "task", "set_value", is_done = true },
+          },
+          is_done = true,
+        },
+        { "sequence",
+          {
+            { "task", "set_value", is_done = true },
+            { "task", "do_yield" },
+          }
+        },
+        { "sequence",
+          {
+            { "task", "return_true" },
+          }
+        },
+      },
+    }
+
+    it( "clears the done flag from all child nodes", function()
+      local expected = {
+        "sequence",
+        {
+          { "any",
+            {
+              { "task", "set_value", is_done = true },
+            },
+            is_done = true,
+          },
+          { "sequence",
+            {
+              { "task", "set_value", is_done = true },
+              { "task", "do_yield" },
+            }
+          },
+          { "sequence",
+            {
+              { "task", "return_true" },
+            }
+          },
+        },
+      }
+
+      local tree = BehaviourTree:new( tree_data, test_tasks, {}, {} )
+      tree:resetNode( tree_data )
+      assert.is_same( expected, tree_data )
+    end)
+  end)
+
   describe( "#task", function()
+    local tree = BehaviourTree:new( {}, test_tasks, {}, {} )
+
     context( "when task name is nil", function()
       local task_name = nil
 
@@ -260,6 +317,8 @@ describe( "BehaviourTree", function()
   end)
 
   describe( "#sequence", function()
+    local tree = BehaviourTree:new( {}, test_tasks, {}, {} )
+
     context( "when all nodes succeed", function()
       local nodes = {
         { "task", "return_true" },
@@ -288,6 +347,10 @@ describe( "BehaviourTree", function()
         { "task", "return_false" },
         { "invert", {{ "noop", {} }} },
       }
+
+      before_each(function()
+        tree:resetNodes( nodes )
+      end)
 
       it( "runs all of the preceding nodes", function()
         spy.on( tree, "task" )
@@ -318,6 +381,8 @@ describe( "BehaviourTree", function()
   end)
 
   describe( "#repeatSequence", function()
+    local tree = BehaviourTree:new( {}, test_tasks, {}, {} )
+
     context( "when sequence yields", function()
       local nodes = {
         { "task", "return_true" },
@@ -378,12 +443,18 @@ describe( "BehaviourTree", function()
   end)
 
   describe( "#any", function()
+    local tree = BehaviourTree:new( {}, test_tasks, {}, {} )
+
     context( "when a child returns true", function()
       local nodes = {
         { "fail", {{ "noop", {} }} },
         { "task", "return_true" },
         { "invert", {{ "noop", {} }} },
       }
+
+      before_each(function()
+        tree:resetNodes( nodes )
+      end)
 
       it( "runs all of the preceding nodes", function()
         spy.on( tree, "task" )
@@ -414,6 +485,8 @@ describe( "BehaviourTree", function()
   end)
 
   describe( "#succeed", function()
+    local tree = BehaviourTree:new( {}, test_tasks, {}, {} )
+
     it( "runs the first child", function()
       local children = {{ "task", "return_nil" }}
 
@@ -445,6 +518,8 @@ describe( "BehaviourTree", function()
   end)
 
   describe( "#fail", function()
+    local tree = BehaviourTree:new( {}, test_tasks, {}, {} )
+
     it( "runs the first child", function()
       local children = {{ "task", "return_false" }}
 
@@ -476,6 +551,8 @@ describe( "BehaviourTree", function()
   end)
 
   describe( "#invert", function()
+    local tree = BehaviourTree:new( {}, test_tasks, {}, {} )
+
     it( "runs the first child", function()
       local children = {{ "fake_node", {} }}
 
