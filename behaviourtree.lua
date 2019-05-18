@@ -145,6 +145,8 @@ function BehaviourTree:repeatSequence( child_nodes )
   while true do
     self:sequence( child_nodes )
 
+    self:resetNodes( child_nodes )
+
     -- only want to run the sequence once per tick.
     -- avoid spinloop by yielding out
     coroutine.yield()

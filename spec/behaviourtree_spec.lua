@@ -429,6 +429,17 @@ describe( "BehaviourTree", function()
         tree.runNode:revert()
       end)
 
+      it( "resets the done flags at the end", function()
+        spy.on( tree, "resetNodes" )
+
+        local co = coroutine.create( function() tree:repeatSequence( nodes ) end)
+        coroutine.resume( co )
+
+        assert.spy( tree.resetNodes ).was.called( 1 )
+
+        tree.resetNodes:revert()
+      end)
+
       it( "yields", function()
         stub( tree, "sequence" )
 
@@ -438,6 +449,24 @@ describe( "BehaviourTree", function()
         assert.is.equal( "suspended", coroutine.status( co ) )
 
         tree.sequence:revert()
+      end)
+    end)
+
+    context( "when calling the node again after it finished", function()
+      local nodes = {
+        { "task", "return_true" },
+      }
+
+      it( "starts over at the first node", function()
+        spy.on( tree, "runNode" )
+
+        local co = coroutine.create( function() tree:repeatSequence( nodes ) end)
+        coroutine.resume( co ) -- run it once
+        coroutine.resume( co ) -- run it again
+
+        assert.spy( tree.runNode ).was.called( 2 )
+
+        tree.runNode:revert()
       end)
     end)
   end)
