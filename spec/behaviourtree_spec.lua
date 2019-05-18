@@ -66,21 +66,25 @@ describe( "BehaviourTree", function()
 
     context( "when behaviour tree was in progress", function()
       local tree_data = {
-        "sequence", {
-            { "sequence", {
-                { "task", "set_value", is_done = true },
-                { "task", "do_yield" },
-                { "task", "update_value" },
-                { "task", "clear_value" },
-              }
-            },
-            { "sequence", {
-                { "task", "return_true" },
-                { "task", "do_yield" },
-                { "task", "return_true" },
-              }
-            },
+        "sequence",
+        {
+          { "task", "return_false", is_done = true },
+          { "sequence",
+            {
+              { "task", "set_value", is_done = true },
+              { "task", "do_yield" },
+              { "task", "update_value" },
+              { "task", "clear_value" },
+            }
           },
+          { "sequence",
+            {
+              { "task", "return_true" },
+              { "task", "do_yield" },
+              { "task", "return_true" },
+            }
+          },
+        },
       }
       local context = {}
       local blackboard = { value = "From reloaded data" }
